@@ -1,0 +1,113 @@
+@font-face {
+    font-family: 'Vazirmatn';
+    src: url('../assets/fonts/Vazirmatn-Light.woff2') format('woff2');
+    font-weight: 300;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'Vazirmatn';
+    src: url('../assets/fonts/Vazirmatn-Medium.woff2') format('woff2');
+    font-weight: 500;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'Vazirmatn';
+    src: url('../assets/fonts/Vazirmatn-Regular.woff2') format('woff2');
+    font-weight: 400;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'Vazirmatn';
+    src: url('../assets/fonts/Vazirmatn-Bold.woff2') format('woff2');
+    font-weight: 700;
+    font-display: swap;
+}
+
+:root {
+    /* Brand Colors */
+    --color-navy: #1f3b83;
+    --color-navy-dark: #162c66;
+    --color-navy-10: rgba(31, 59, 131, 0.10);
+    --color-navy-20: rgba(31, 59, 131, 0.20);
+    --color-gold: #b19a33;
+    --color-gold-dark: #8a7520;
+    --color-gold-10: rgba(177, 154, 51, 010);
+
+    /* UI Colors */
+    --color-bg: #ffffff;
+    --color-surface: #f3f5fa;
+    --color-border: #dde3f0;
+    --color-text: #16192e;
+    --color-muted: #64748b;
+    --color-success: #16a34a;
+    --color-danger: #e05454;
+
+    /* Typography */
+    --font: 'Vazirmatn', sans-serif;
+
+    /* Spacing */
+    --space-xs: 4px;
+    --space-sm: 8px;
+    --space-md: 16px;
+    --space-lg: 24px;
+    --space-xl: 32px;
+
+    /* Border Radius */
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 20px;
+    --radius-full: 999px;
+}
+
+/* Reset */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+/* Base */
+body {
+    font-family: var(--font);
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    direction: rtl;
+    min-height: 100dvh;
+    max-width: 430px;
+    margin: 0 auto;
+    overflow-x: hidden;
+}
+
+/* Typography */
+.text-muted { color: var(--color-muted); }
+.text-navy  { color: var(--color-navy); }
+.text-gold  { color: var(--color-gold); }
+.text-sm    { font-size: 12px; }
+.text-xs    { font-size: 10px; }
+.text-bold  { font-weight: 500; }
+
+/* Layout */
+.flex       { display: flex; align-items: center; }
+.flex-col   { display: flex; flex-direction: column; }
+.flex-1     { flex: 1; }
+.gap-sm     { gap: var(--space-sm); }
+.gap-md     { gap: var(--space-md); }
+
+/* Spacing */
+.p-md       { padding: var(--space-md); }
+.px-md      { padding-inline: var(--space-md); }
+.py-sm      { padding-block: var(--space-sm); }
+
+/* Surfaces */
+.card {
+    background: var(--color-bg);
+    border: 0.5px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: var(--space-md);
+}
+
+.surface {
+    background: var(--color-surface);
+    border-radius: var(--radius-md);
+    padding: var(--space-md);
+}

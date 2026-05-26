@@ -179,3 +179,14 @@ cython_debug/
 #  refer to https://docs.cursor.com/context/ignore-files
 .cursorignore
 .cursorindexingignore
+
+# Python
+*.pyc
+.venv/
+
+# UV
+.python-version
+
+# OS
+.DS_Store
+Thumbs.db
