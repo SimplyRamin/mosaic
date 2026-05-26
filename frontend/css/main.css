@@ -25,11 +25,11 @@
 
 :root {
     /* Brand Colors */
-    --color-navy: #1f3b83;
+    --color-navy: #1e3a8a;
     --color-navy-dark: #162c66;
     --color-navy-10: rgba(31, 59, 131, 0.10);
     --color-navy-20: rgba(31, 59, 131, 0.20);
-    --color-gold: #b19a33;
+    --color-gold: #b8960c;
     --color-gold-dark: #8a7520;
     --color-gold-10: rgba(177, 154, 51, 010);
 
@@ -111,3 +111,12 @@ body {
     border-radius: var(--radius-md);
     padding: var(--space-md);
 }
+
+.icon {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+.icon-sm { width: 16px; height: 16px; }
+.icon-lg { width: 24px; height: 24px; }

@@ -9,10 +9,10 @@ const errorMessage    = document.getElementById('error-message');
 toggleBtn.addEventListener('click', function() {
     if (passwordInput.type === 'password') {
         passwordInput.type = 'text';
-        toggleIcon.textContent = '🙈';
+        toggleIcon.querySelector('use').setAttribute('href', 'assets/icons/icons.svg#icon-eye-off');
     } else {
         passwordInput.type = 'password';
-        toggleIcon.textContent = '👁';
+        toggleIcon.querySelector('use').setAttribute('href', 'assets/icons/icons.svg#icon-eye');
     }
 });
 
