@@ -115,13 +115,16 @@
 }
 
 .camera-btn {
-    background: var(--color-gold-10);
+    background: none;
     border: none;
+    color: var(--color-muted);
     border-radius: var(--radius-sm);
-    padding: 4px 8px;
+    padding: var(--space-xs);
     cursor: pointer;
-    font-size: 16px;
+    font-size: 20px;
     flex-shrink: 0;
+    display: flex;
+    align-items: center;
 }
 
 .chips-section {
@@ -281,35 +284,4 @@
     background: var(--color-surface);
     color: var(--color-muted);
     border: 0.5px solid var(--color-border);
-}
-
-.bottom-nav {
-    display: flex;
-    height: 60px;
-    border-top: 0.5px solid var(--color-border);
-    background: var(--color-bg);
-    flex-shrink: 0;
-}
-
-.nav-item {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 2px;
-    text-decoration: none;
-    color: var(--color-muted);
-    transition: color 0.15s;
-}
-
-.nav-item.active {
-    color: var(--color-navy);
-}
-
-.nav-icon {
-    font-size: 20px;
-}
-.nav-label {
-    font-size: 9px;
 }
