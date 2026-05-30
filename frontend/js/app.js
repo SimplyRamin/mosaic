@@ -7,7 +7,6 @@ function renderBottomNav() {
     const items = [
         { icon: 'icon-home',    label: 'خانه',    href: 'home.html' },
         { icon: 'icon-search',  label: 'جستجو',   href: 'search.html' },
-        { icon: 'icon-sitemap', label: 'چارت',    href: 'org.html' },
         { icon: 'icon-user',    label: 'پروفایل', href: 'profile.html' }
     ];
 

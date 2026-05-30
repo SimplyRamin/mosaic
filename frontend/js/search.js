@@ -114,6 +114,7 @@ function performSearch(query) {
 
     if (results.length === 0) {
         showState('no-results');
+        return;
     }
 
     results.forEach(function(person) {
