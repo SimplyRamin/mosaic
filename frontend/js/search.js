@@ -7,6 +7,7 @@ const emptyState    = document.getElementById('empty-state');
 const noResults     = document.getElementById('no-results');
 const cameraBtn     = document.getElementById('camera-btn');
 const cameraSuggest = document.getElementById('camera-suggest-btn');
+const micBtn        = document.getElementById('mic-btn');
 
 // Mock data - replace with API call when backend is ready
 const mockPeople = [
@@ -148,6 +149,61 @@ cameraBtn.addEventListener('click', function() {
 cameraSuggest.addEventListener('click', function() {
     window.location.href = 'camera.html';
 });
+
+// Voice search
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+if (!SpeechRecognition) {
+    // Browser doesn't support speech recognition - hide the button
+    micBtn.style.display = 'none';
+} else {
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'fa-IR';
+    recognition.continuous = false;
+    recognition.interimResults = false;
+
+    let isListening = false;
+
+    micBtn.addEventListener('click', function() {
+        if (isListening) {
+            recognition.stop();
+            return;
+        }
+        recognition.start();
+    });
+
+    recognition.addEventListener('start', function() {
+        isListening = true;
+        micBtn.classList.add('listening');
+    });
+
+    recognition.addEventListener('result', function(e) {
+        const transcript = e.results[0][0].transcript;
+        searchInput.value = transcript;
+        clearBtn.classList.add('visible');
+        performSearch(transcript);
+    });
+
+    recognition.addEventListener('end', function() {
+        isListening = false;
+        micBtn.classList.remove('listening');
+    });
+
+    recognition.addEventListener('error', function(e) {
+        isListening = false;
+        micBtn.classList.remove('listening');
+
+        if (e.error === 'not-allowed') {
+            showToast('دسترسی به میکروفن رد شده است', 'error');
+        } else if (e.error === 'network') {
+            showToast('برای جستجوی صوتی به اینترنت نیاز است', 'error');
+        } else if (e.error === 'no-speech') {
+            showToast('صدایی شنیده نشد، دوباره امتحان کنید', 'info');
+        } else {
+            showToast('جستجوی صوتی در دسترس نیست', 'error');
+        }
+    });
+}
 
 // Read query from URL - comes from home screen search
 const params = new URLSearchParams(window.location.search);

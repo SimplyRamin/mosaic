@@ -217,3 +217,55 @@ body {
     color: var(--color-navy);
     border: 0.5px solid var(--color-navy-10);
 }
+
+/* ------------------ Microphone -------------------*/
+
+.mic-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--color-muted);
+    display: flex;
+    align-items: center;
+    padding: var(--space-xs);
+    flex-shrink: 0;
+    transition: color 0.15s;
+}
+
+.mic-btn.listening {
+    color: var(--color-danger);
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0%   { opacity: 1; }
+    50%  { opacity: 0.4; }
+    100% { opacity: 1; }
+}
+
+/* ------------------- Toast -------------------------*/
+.toast {
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    color: white;
+    font-family: var(--font);
+    font-size: 13px;
+    padding: 10px 20px;
+    border-radius: var(--radius-full);
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.2s, transform 0.2s;
+    z-index: 1000;
+    pointer-events: none;
+}
+
+.toast--visible {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+.toast--error   { background: var(--color-danger); }
+.toast--success { background: var(--color-success); }
+.toast--info    { background: var(--color-text); }

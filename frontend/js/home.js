@@ -92,6 +92,60 @@ document.getElementById('camera-btn').addEventListener('click', function() {
     window.location.href = 'camera.html';
 });
 
+// Voice search
+const SpeechRecognition = window.speechRecognition || window.webkitSpeechRecognition;
+const micBtn = document.getElementById('mic-btn');
+
+if (!SpeechRecognition) {
+    micBtn.style.display = 'none';
+} else {
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'fa-IR';
+    recognition.continuous = false;
+    recognition.interimResults = false;
+
+    let isListening = false;
+
+    micBtn.addEventListener('click', function() {
+        if (isListening) {
+            recognition.stop();
+            return;
+        }
+        recognition.start();
+    });
+
+    recognition.addEventListener('start', function() {
+        isListening = true;
+        micBtn.classList.add('listening');
+    });
+
+    recognition.addEventListener('result', function(e) {
+        const transcript = e.results[0][0].transcript;
+        // Navigate to search screen with the voice query
+        window.location.href = 'search.html?q=' + encodeURIComponent(transcript);
+    });
+
+    recognition.addEventListener('end', function() {
+        isListening = false;
+        micBtn.classList.remove('listening');
+    });
+
+    recognition.addEventListener('error', function(e) {
+        isListening = false;
+        micBtn.classList.remove('listening');
+
+        if (e.error === 'not-allowed') {
+            showToast('دسترسی به میکروفن رد شده است', 'error');
+        } else if (e.error === 'network') {
+            showToast('برای جستجوی صوتی به اینترنت نیاز است', 'error');
+        } else if (e.error === 'no-speech') {
+            showToast('صدایی شنیده نشد، دوباره امتحان کنید', 'info');
+        } else {
+            showToast('جستجوی صوتی در دسترس نیست', 'error');
+        }
+    });
+}
+
 // Render on load
 renderList('people-list', mockTeam);
 renderList('recent-list', mockRecent);
