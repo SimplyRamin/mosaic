@@ -279,9 +279,3 @@
     color: var(--color-navy);
     border: 0.5px solid var(--color-navy-20);
 }
-
-.badge-locked {
-    background: var(--color-surface);
-    color: var(--color-muted);
-    border: 0.5px solid var(--color-border);
-}
