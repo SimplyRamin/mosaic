@@ -120,7 +120,7 @@ function performSearch(query) {
         resultsList.appendChild(createResultCard(person));
     });
 
-    resultsCount.textContent = results.length + 'نتیجه برای «' + query + '»';
+    resultsCount.textContent = results.length + ' نتیجه برای «' + query + '»';
     showState('results');
 }
 
