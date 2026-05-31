@@ -76,6 +76,8 @@ body {
     max-width: 430px;
     margin: 0 auto;
     overflow-x: hidden;
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
 }
 
 /* Typography */
@@ -129,6 +131,8 @@ body {
     border-top: 0.5px solid var(--color-border);
     background: var(--color-bg);
     flex-shrink: 0;
+    padding-bottom: env(safe-area-inset-bottom);
+    height: calc(60px + env(safe-area-inset-bottom));
 }
 
 .nav-item {
