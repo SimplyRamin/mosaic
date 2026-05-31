@@ -234,6 +234,8 @@ body {
     padding: var(--space-xs);
     flex-shrink: 0;
     transition: color 0.15s;
+    min-width: 28px;
+    min-height: 28px;
 }
 
 .mic-btn.listening {
@@ -373,8 +375,19 @@ body {
   padding: var(--space-xs) 0;
 }
 
-.back-btn svg {
-    transform: scaleX(-1);
+.back-btn {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: var(--font);
+    font-size: 13px;
+    color: var(--color-navy);
+    padding: var(--space-xs) 0;
+    direction: ltr;
+    margin-right: auto;
 }
 
 .hidden {

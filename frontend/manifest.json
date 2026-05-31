@@ -11,12 +11,12 @@
     "dir": "rtl",
     "icons": [
         {
-            "src": "assets/icon-pwa.png",
+            "src": "assets/icons/icon-pwa.png",
             "sizes": "192x192",
             "type": "image/png"
         },
         {
-            "src": "assets/icon-pwa.png",
+            "src": "assets/icons/icon-pwa.png",
             "sizes": "512x512",
             "type": "image/png"
         }

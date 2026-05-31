@@ -153,6 +153,15 @@ if (!SpeechRecognition) {
     });
 }
 
+// Logout
+document.getElementById('logout-btn').addEventListener('click', function() {
+    // TODO: call logout API when backend is ready
+    // for now just redirect to login
+    if (confirm('آیا می‌خواهید از سامانه خارج شوید؟')) {
+        window.location.href = '../index.html';
+    }
+});
+
 // Render on load
 renderList('people-list', mockTeam);
 renderList('recent-list', mockRecent);

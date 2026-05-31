@@ -263,3 +263,13 @@
 .gender-fill--female {
     background: var(--color-gold);
 }
+
+.logout-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--color-muted);
+    display: flex;
+    align-items: center;
+    padding: var(--space-xs);
+}
