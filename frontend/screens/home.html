@@ -8,7 +8,9 @@
   <link rel="stylesheet" href="../css/home.css">
   <script src="../js/app.js" defer></script>
   <script src="../js/home.js" defer></script>
+  <link rel="icon" type="image/png" href="../assets/icons/icon-pwa.png">
 </head>
+
 <body>
     <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
       <symbol id="icon-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
@@ -166,12 +168,26 @@
       <!-- Stats row -->
       <div class="stats-row">
         <div class="stat-card">
-          <span class="stat-number" id="team-count">۱۲</span>
-          <span class="stat-label">نفر تیم من</span>
+          <span class="stat-number" id="active-count">۳،۸۴۷</span>
+          <span class="stat-label">کارمند فعال</span>
         </div>
         <div class="stat-card">
-          <span class="stat-number stat-number--total" id="total-count">۳،۸۴۷</span>
-          <span class="stat-label">کل شرکت</span>
+          <div class="gender-stat">
+            <div class="gender-row">
+              <span class="gender-label">مرد</span>
+              <span class="gender-percent" id="male-percent">۷۲٪</span>
+            </div>
+            <div class="gender-bar">
+              <div class="gender-fill gender-fill--male" id="male-fill"></div>
+            </div>
+            <div class="gender-row" style="margin-top:4px">
+              <span class="gender-label">زن</span>
+              <span class="gender-percent" id="female-percent">۲۸٪</span>
+            </div>
+            <div class="gender-bar">
+              <div class="gender-fill gender-fill--female" id="female-fill"></div>
+            </div>
+          </div>
         </div>
       </div>
 

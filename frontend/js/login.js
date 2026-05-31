@@ -4,6 +4,8 @@ const toggleBtn       = document.getElementById('toggle-password');
 const toggleIcon      = document.getElementById('toggle-icon');
 const loginBtn        = document.getElementById('login-btn');
 const errorMessage    = document.getElementById('error-message');
+const demoLogin       = document.getElementById('demo-login');
+const demoBtn         = document.getElementById('demo-btn');
 
 // Toggle password visibility
 toggleBtn.addEventListener('click', function() {
@@ -45,4 +47,20 @@ loginBtn.addEventListener('click', function() {
         loginBtn.textContent = 'ورود به سامانه';
         errorMessage.textContent = 'کد پرسنلی یا رمز عبور اشتباه است'
     }, 1500);
+})
+
+// Show demo button only in demo mode
+// app.js loads before login.js so DEMO_MODE is available
+if (typeof DEMO_MODE !== 'undefined' && DEMO_MODE){
+    demoLogin.classList.remove('hidden');
+}
+
+demoBtn.addEventListener('click', function() {
+    employeeIdInput.value = 'admin';
+    passwordInput.value   = 'admin';
+
+    // Small delay so user sees the fields fill in
+    setTimeout(function() {
+        window.location.href = 'screens/home.html';
+    }, 600)
 })

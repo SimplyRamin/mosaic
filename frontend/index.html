@@ -6,6 +6,7 @@
     <title>Makan+</title>
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/login.css">
+    <link rel="icon" type="image/png" href="assets/icons/">
   </head>
   <body>
     <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
@@ -149,9 +150,18 @@
           ورود به سامانه
         </button>
 
-        <button class="btn-ghost" type="button">
+        <button class="btn-ghost" type="button" onclick="window.location.href='screens/forgot-password.html'">
           فراموشی رمز عبور؟
         </button>
+
+        <div class="demo-login hidden" id="demo-login">
+          <div class="demo-divider">
+            <span>نسخه نمایشی</span>
+          </div>
+          <button class="btn-demo" id="demo-btn" type="button">
+            ورود با حساب آزمایشی
+          </button>
+        </div>
 
       </div>
 

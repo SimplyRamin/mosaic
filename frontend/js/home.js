@@ -69,6 +69,13 @@ function renderList(listId, data) {
     });
 }
 
+function renderStats(malePercent, femalePercent) {
+    document.getElementById('male-percent').textContent = malePercent + '٪';
+    document.getElementById('female-percent').textContent = femalePercent + '٪';
+    document.getElementById('male-fill').style.width = malePercent + '%';
+    document.getElementById('female-fill').style.width = femalePercent + '%';
+}
+
 // Chip filter logic
 const chips = document.querySelectorAll('.chip');
 chips.forEach(function(chip) {
@@ -149,3 +156,4 @@ if (!SpeechRecognition) {
 // Render on load
 renderList('people-list', mockTeam);
 renderList('recent-list', mockRecent);
+renderStats(72, 28);

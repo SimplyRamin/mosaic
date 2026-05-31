@@ -217,3 +217,49 @@
     letter-spacing: 0.04em;
     margin-bottom: var(--space-sm);
 }
+
+.gender-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    width: 100%;
+}
+
+.gender-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.gender-label {
+    font-size: 10px;
+    color: var(--color-muted);
+}
+
+.gender-percent {
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--color-text);
+}
+
+.gender-bar {
+    height: 4px;
+    background: var(--color-border);
+    border-radius: var(--radius-full);
+    overflow: hidden;
+    margin-bottom: 4px;
+}
+
+.gender-fill {
+    height: 100%;
+    border-radius: var(--radius-full);
+    transition: width 0.6s ease;
+}
+
+.gender-fill--male {
+    background: var(--color-navy);
+}
+
+.gender-fill--female {
+    background: var(--color-gold);
+}

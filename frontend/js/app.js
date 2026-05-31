@@ -1,5 +1,11 @@
+const DEMO_MODE = true;
+
 function renderBottomNav() {
     const currentPage = window.location.pathname.split('/').pop();
+
+    // Pges that should not show bottom navigation
+    const noNavPages = ['camera.html'];
+    if (noNavPages.includes(currentPage)) return;
 
     const nav = document.createElement('nav');
     nav.className = 'bottom-nav';
