@@ -66,10 +66,6 @@
     display: none;
 }
 
-.hidden {
-    display: none !important;
-}
-
 .empty-state,
 .no-results {
     display: flex;
