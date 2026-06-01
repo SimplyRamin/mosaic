@@ -1,12 +1,26 @@
+body {
+    background-color: #000;
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
+}
+
 .screen {
     display: flex;
     flex-direction: column;
     height: 100dvh;
     overflow: hidden;
     background: #000;
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
 }
 
 /* Header */
+.camera-header .back-btn {
+    margin-right: 0;
+    color: rgba(255, 255, 255, 0.8);
+}
+
 .camera-header {
     display: flex;
     align-items: center;
@@ -14,6 +28,7 @@
     padding: var(--space-sm) var(--space-md);
     flex-shrink: 0;
     z-index: 10;
+    direction: ltr;
 }
 
 .back-btn {

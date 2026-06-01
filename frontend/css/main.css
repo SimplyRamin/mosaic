@@ -66,6 +66,18 @@
     padding: 0;
 }
 
+* {
+    /* Disabling text selection globally */
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+/* Enable only on profile content */
+.profile-section .info-value {
+    -webkit-user-select: text;
+    user-select: text;
+}
+
 /* Base */
 body {
     font-family: var(--font);
@@ -265,6 +277,36 @@ body {
     transition: opacity 0.2s, transform 0.2s;
     z-index: 1000;
     pointer-events: none;
+}
+
+.update-toast {
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--color-navy);
+    color: white;
+    font-family: var(--font);
+    font-size: 13px;
+    padding: 10px 16px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    z-index: 1000;
+    white-space: nowrap;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.update-toast button {
+    background: var(--color-gold);
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 4px 10px;
+    font-family: var(--font);
+    font-size: 12px;
+    cursor: pointer;
 }
 
 .toast--visible {

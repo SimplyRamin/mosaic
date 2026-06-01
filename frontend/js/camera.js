@@ -15,6 +15,7 @@ const resultRole    = document.getElementById('result-role');
 const resultBtn     = document.getElementById('result-btn');
 const unavailable   = document.getElementById('camera-unavailable');
 const hintText      = document.getElementById('camera-hint');
+const flashBtn      = document.getElementById('flash-btn');
 
 let currentStream   = null;
 let facingMode      = 'environment'; // back camera by default
@@ -156,6 +157,13 @@ flipBtn.addEventListener('click', async function() {
     facingMode = facingMode === 'environment' ? 'user' : 'environment';
     resultCard.classList.add('hidden');
     await startCamera();
+});
+
+flashBtn.style.opacity = '0.3';
+flashBtn.style.cursor = 'not-allowed';
+flashBtn.setAttribute('title', 'فلش در مرورگر پشتیبانی نمی‌شود');
+flashBtn.addEventListener('click', function() {
+    showToast('کنترل فلش در مرورگر پشتیبانی نمی‌شود', 'info');
 });
 
 galleryBtn.addEventListener('click', function() {

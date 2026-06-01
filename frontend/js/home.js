@@ -100,7 +100,7 @@ document.getElementById('camera-btn').addEventListener('click', function() {
 });
 
 // Voice search
-const SpeechRecognition = window.speechRecognition || window.webkitSpeechRecognition;
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 const micBtn = document.getElementById('mic-btn');
 
 if (!SpeechRecognition) {
@@ -110,6 +110,9 @@ if (!SpeechRecognition) {
     recognition.lang = 'fa-IR';
     recognition.continuous = false;
     recognition.interimResults = false;
+
+    // Add this - required for Safari PWA
+    recognition.maxAlternatives = 1;
 
     let isListening = false;
 
@@ -143,8 +146,8 @@ if (!SpeechRecognition) {
 
         if (e.error === 'not-allowed') {
             showToast('دسترسی به میکروفن رد شده است', 'error');
-        } else if (e.error === 'network') {
-            showToast('برای جستجوی صوتی به اینترنت نیاز است', 'error');
+        } else if (e.error === 'network' || e.error === 'service-not-allowed') {
+            showToast('سرویس جستجوی صوتی در دسترس نیست', 'error');
         } else if (e.error === 'no-speech') {
             showToast('صدایی شنیده نشد، دوباره امتحان کنید', 'info');
         } else {

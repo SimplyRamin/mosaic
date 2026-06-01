@@ -1,6 +1,6 @@
-const { cache } = require("react");
-
-const CACHE_NAME = 'makanplus-v1';
+// Version: 1.3 - should update this on every deployment
+const CACHE_VERSION = 'makanplus-v1';
+const CACHE_NAME = `makanplus-${CACHE_VERSION}`;
 
 // Files to cache for offline use
 const ASSETS = [
@@ -41,7 +41,6 @@ self.addEventListener('install', function(e) {
             return cache.addAll(ASSETS);
         })
     );
-    self.skipWaiting();
 });
 
 // Activate - clean up old caches
@@ -53,21 +52,54 @@ self.addEventListener('activate', function(e) {
                     .filter(function(key) { return key !== CACHE_NAME; })
                     .map(function(key) { return caches.delete(key); })
             );
+        }).then(function() {
+            return self.clients.claim();
         })
     );
-    self.clients.claim();
 });
 
-// Fetch - serve from cache, fall back to network
+// Fetch - network first for HTML, cache first for assets
 self.addEventListener('fetch', function(e) {
     // Skip API calls - always go to network for those
-    if (e.request.url.includes('/api/')) {
-        return;
-    }
+    if (e.request.url.includes('/api/')) return;
 
-    e.respondWith(
-        caches.match(e.request).then(function(cached) {
-            return cached || fetch(e.request);
-        })
-    );
+    const isHTML = e.request.headers.get('accept') &&
+                   e.request.headers.get('accept').includes('text/html');
+
+    if (isHTML){
+        // Network first for HTML - always get fresh pages
+        e.respondWith(
+            fetch(e.request)
+                .then(function(response) {
+                    const clone = response.clone();
+                    caches.open(CACHE_NAME).then(function(cache) {
+                        cache.put(e.request, clone);
+                    });
+                    return response;
+                })
+                .catch(function() {
+                    return caches.match(e.request);
+                })
+        );
+    } else {
+        // Cache first for assets - CSS, JS, fonts, images
+        e.respondWith (
+            caches.match(e.request).then(function(cached){
+                return cached || fetch(e.request).then(function(response) {
+                    const clone = response.clone();
+                    caches.open(CACHE_NAME).then(function(cache) {
+                        cache.put(e.request, clone);
+                    });
+                    return response;
+                });
+            })
+        );
+    }
+});
+
+// Listen for skip waiting message from app
+self.addEventListener('message', function(e) {
+    if (e.data === 'skipWaiting') {
+        self.skipWaiting();
+    }
 });
