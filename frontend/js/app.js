@@ -94,7 +94,17 @@ function showUpdateToast(newVersion) {
     document.getElementById('update-btn').addEventListener('click', function() {
         localStorage.setItem('app_version', newVersion);
         toast.remove();
-        window.location.reload(true);
+
+        // Clear all caches then reload fresh
+        caches.keys().then(function(keys) {
+            return Promise.all(
+                keys.map(function(key) {
+                    return caches.delete(key);
+                })
+            );
+        }).then(function() {
+            window.location.reload(true);
+        });
     });
 }
 

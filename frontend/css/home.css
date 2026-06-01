@@ -24,7 +24,7 @@
 }
 
 .greeting-name {
-    font-size: 16px;
+    font-size: 18px;
     font-weight: 500;
     color: var(--color-navy);
 }
@@ -192,7 +192,7 @@
 }
 
 .stat-number {
-    font-size: 22px;
+    font-size: 24px;
     font-weight: 500;
     color: var(--color-navy);
 }
@@ -202,7 +202,7 @@
 }
 
 .stat-label {
-    font-size: 11px;
+    font-size: 13px;
     color: var(--color-muted);
 }
 
@@ -211,7 +211,7 @@
 }
 
 .section-title {
-    font-size: 11px;
+    font-size: 13px;
     color: var(--color-muted);
     font-weight: 500;
     letter-spacing: 0.04em;

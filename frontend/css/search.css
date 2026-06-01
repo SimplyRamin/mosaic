@@ -26,7 +26,7 @@
     border: none;
     outline: none;
     font-family: var(--font);
-    font-size: 14px;
+    font-size: 16px;
     color: var(--color-text);
     direction: rtl;
 }
@@ -85,18 +85,18 @@
 }
 
 .empty-title {
-    font-size: 14px;
+    font-size: 16px;
     font-weight: 500;
     color: var(--color-text);
 }
 
 .empty-subtitle {
-    font-size: 12px;
+    font-size: 13px;
     color: var(--color-muted);
 }
 
 .results-meta {
-    font-size: 11px;
+    font-size: 13px;
     color: var(--color-muted);
     padding: 0 var(--space-xs) var(--space-sm);
 }
