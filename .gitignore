@@ -190,3 +190,8 @@ cython_debug/
 # OS
 .DS_Store
 Thumbs.db
+
+# SSL Certificates
+*.pem
+*.key
+frontend/serve.py

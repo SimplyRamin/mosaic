@@ -37,10 +37,6 @@ function createPersonCard(person) {
     const card = document.createElement('div');
     card.className = 'person-card';
     card.dataset.id = person.id;
-
-    const badgeHTML = person.badge === 'team'
-        ? `<span class="person-badge badge-team">تیم</span>`
-        : `<span class="person-badge badge-locked>🔒</span>`;
     
         card.innerHTML = `
             <div class="person-avatar"
