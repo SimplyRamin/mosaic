@@ -134,50 +134,109 @@
 
         <main class="main-content">
 
-            <!-- Hero Section -->
-            <div class="profile-hero">
-                <div class="profile-avatar" id="profile-avatar"></div>
-                <h1 class="profile-name" id="profile-name"></h1>
-                <p class="profile-position" id="profile-position"></p>
-                <div class="profile-tags" id="profile-tags"></div>
+            <!-- Skeleton loader - show while data loads -->
+            <div class="skeleton-screen" id="skeleton-screen">
+
+                <div class="skeleton-hero">
+                    <div class="skeleton-circle"></div>
+                    <div class="skeleton-line skeleton-line--lg"></div>
+                    <div class="skeleton-line skeletin-line--sm"></div>
+                </div>
+
+                <div class="skeleton-section">
+                    <div class="skeleton-line skeleton-line--xs"></div>
+                    <div class="skeleton-row">
+                        <div class="skeleton-icon"></div>
+                        <div class="skeleton-lines">
+                            <div class="skeleton-line skeleton-line--xs"></div>
+                            <div class="skeleton-line skeleton-line--md"></div>
+                        </div>
+                    </div>
+                    <div class="skeleton-row">
+                        <div class="skeleton-icon"></div>
+                        <div class="skeleton-lines">
+                            <div class="skeleton-line skeleton-line--xs"></div>
+                            <div class="skeleton-line skeleton-line--md"></div>
+                        </div>
+                    </div>
+                    <div class="skeleton-row">
+                        <div class="skeleton-icon"></div>
+                        <div class="skeleton-lines">
+                            <div class="skeleton-line skeleton-line--xs"></div>
+                            <div class="skeleton-line skeleton-line--md"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="skeleton-section">
+                    <div class="skeleton-line skeleton-line--xs"></div>
+                    <div class="skeleton-row">
+                        <div class="skeleton-icon"></div>
+                        <div class="skeleton-lines">
+                            <div class="skeleton-line skeleton-line--xs"></div>
+                            <div class="skeleton-line skeleton-line--md"></div>
+                        </div>
+                    </div>
+                    <div class="skeleton-row">
+                        <div class="skeleton-icon"></div>
+                        <div class="skeleton-lines">
+                            <div class="skeleton-line skeleton-line--xs"></div>
+                            <div class="skeleton-line skeleton-line--md"></div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
 
-            <!-- Contact Section -->
-            <div class="profile-section">
-                <h2 class="profile-section-title">اطلاعات تماس</h2>
-                <div class="info-list" id="contact-list"></div>
-            </div>
+            <!-- Actual content - hidden until data loads -->
+            <div class="profile-content hidden" id="profile-content">
 
-            <div class="divider"></div>
+                <!-- Hero Section -->
+                <div class="profile-hero">
+                    <div class="profile-avatar" id="profile-avatar"></div>
+                    <h1 class="profile-name" id="profile-name"></h1>
+                    <p class="profile-position" id="profile-position"></p>
+                    <div class="profile-tags" id="profile-tags"></div>
+                </div>
 
-            <!-- Employment Section -->
-            <div class="profile-section">
-                <h2 class="profile-section-title">اطلاعات استخدام</h2>
-                <div class="info-list" id="employment-list"></div>
-            </div>
+                <!-- Contact Section -->
+                <div class="profile-section">
+                    <h2 class="profile-section-title">اطلاعات تماس</h2>
+                    <div class="info-list" id="contact-list"></div>
+                </div>
 
-            <div class="divider"></div>
+                <div class="divider"></div>
 
-            <!-- HR Details Section-->
-            <div class="profile-section">
-                <h2 class="profile-section-title">اطلاعات پرسنلی</h2>
-                <div class="info-list" id="hr-list"></div>
-            </div>
+                <!-- Employment Section -->
+                <div class="profile-section">
+                    <h2 class="profile-section-title">اطلاعات استخدام</h2>
+                    <div class="info-list" id="employment-list"></div>
+                </div>
 
-            <div class="divider"></div>
+                <div class="divider"></div>
 
-            <!-- Compensation Section -->
-            <div class="profile-section">
-                <h2 class="profile-section-title">جبران خدمات</h2>
-                <div class="info-list" id="compensation-list"></div>
-            </div>
+                <!-- HR Details Section-->
+                <div class="profile-section">
+                    <h2 class="profile-section-title">اطلاعات پرسنلی</h2>
+                    <div class="info-list" id="hr-list"></div>
+                </div>
 
-            <div class="divider"></div>
+                <div class="divider"></div>
 
-            <!-- Attendance Section -->
-            <div class="profile-section">
-                <h2 class="profile-section-title">کارکرد و  حضور</h2>
-                <div class="info-list" id="attendance-list"></div>
+                <!-- Compensation Section -->
+                <div class="profile-section">
+                    <h2 class="profile-section-title">جبران خدمات</h2>
+                    <div class="info-list" id="compensation-list"></div>
+                </div>
+
+                <div class="divider"></div>
+
+                <!-- Attendance Section -->
+                <div class="profile-section">
+                    <h2 class="profile-section-title">کارکرد و  حضور</h2>
+                    <div class="info-list" id="attendance-list"></div>
+                </div>
+
             </div>
 
         </main>

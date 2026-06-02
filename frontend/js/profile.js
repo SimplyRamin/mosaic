@@ -172,6 +172,16 @@ function renderProfile(employee) {
     attendanceList.appendChild(createInfoRow('icon-user-check', 'تعداد تاخیر', employee.attendance.lateEntries, false));
 }
 
+function showSkeleton() {
+    document.getElementById('skeleton-screen').classList.remove('hidden');
+    document.getElementById('profile-content').classList.add('hidden');
+}
+
+function hideSkeleton() {
+    document.getElementById('skeleton-screen').classList.add('hidden');
+    document.getElementById('profile-content').classList.remove('hidden');
+}
+
 function renderNotFound() {
     const main = document.querySelector('.main-content');
     main.innerHTML = `
@@ -192,14 +202,22 @@ document.getElementById('back-btn').addEventListener('click', function() {
 });
 
 // Load Profile
+showSkeleton();
+
 if (!employeeID) {
+    hideSkeleton();
     renderNotFound();
 } else {
     const employee = mockEmployees[employeeID];
     if (employee) {
-        renderProfile(employee);
-        document.title = 'ماکان+ · ' + employee.name;
+        // Simulate loading delay so skeleton is visible
+        setTimeout(function() {
+            renderProfile(employee);
+            hideSkeleton();
+            document.title = 'ماکان+ · ' + employee.name;
+        }, 800);
     } else {
+        hideSkeleton();
         renderNotFound();
     }
 }

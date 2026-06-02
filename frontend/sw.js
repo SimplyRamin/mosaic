@@ -1,4 +1,4 @@
-// Version: 2025-06-01-005
+// Version: 2025-06-01-006
 const CACHE_VERSION = 'makanplus-v2';
 const CACHE_NAME = `makanplus-${CACHE_VERSION}`;
 
