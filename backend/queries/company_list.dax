@@ -1,0 +1,8 @@
+EVALUATE
+SUMMARIZE(
+    'Dim_Company',
+    'Dim_Company'[Corporation_ID],
+    'Dim_Company'[Company_Name],
+    'Dim_Company'[Company_Status],
+    'Dim_Company'[Holding_Name]
+)

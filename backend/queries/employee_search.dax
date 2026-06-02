@@ -1,0 +1,23 @@
+EVALUATE
+TOPN(
+    20,
+    FILTER(
+        SUMMARIZE(
+            'Dim_Employee',
+            'Dim_Employee'[Employee_Code],
+            'Dim_Employee'[Full_Name],
+            'Dim_Employee'[First_Name],
+            'Dim_Employee'[Last_Name],
+            'Dim_Employee'[Post],
+            'Dim_Employee'[ORG],
+            'Dim_Employee'[Company_Name],
+            'Dim_Employee'[Holding_Name],
+            'Dim_Employee'[Work_Loc_Name],
+            'Dim_Employee'[Is_Active_Text]
+        ),
+        CONTAINSSTRING('Dim_Employee'[Full_Name], "{query}") ||
+        CONTAINSSTRING('Dim_Employee'[Employee_Code], "{query}") ||
+        CONTAINSSTRING('Dim_Employee'[Post], "{query}") ||
+        CONTAINSSTRING('Dim_Employee'[ORG], "{query}")
+    )
+)

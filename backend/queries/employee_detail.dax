@@ -1,0 +1,41 @@
+DEFINE
+VAR ONE =
+    FILTER(
+        SELECTCOLUMNS(
+            ADDCOLUMNS(
+                'Dim_Employee',
+                "Insurance_Number",
+                    CALCULATE(
+                        SELECTEDVALUE('Fact_Employee_Insurance'[Insurance_Number])
+                    )
+            ),
+            "Employee_Code", 'Dim_Employee'[Employee_Code],
+            "Holding_Name", 'Dim_Employee'[Holding_Name],
+            "Corporation_ID", 'Dim_Employee'[Corporation_ID],
+            "Company_Name", 'Dim_Employee'[Company_Name],
+            "ORG", 'Dim_Employee'[ORG],
+            "Post", 'Dim_Employee'[Post],
+            "CostCenter_Name", 'Dim_Employee'[CostCenter_Name],
+            "Work_Loc_Name", 'Dim_Employee'[Work_Loc_Name],
+            "Is_Active_Text", 'Dim_Employee'[Is_Active_Text],
+            "Full_Name", 'Dim_Employee'[Full_Name],
+            "First_Name", 'Dim_Employee'[First_Name],
+            "Last_Name", 'Dim_Employee'[Last_Name],
+            "Gender_Type", 'Dim_Employee'[Gender_Type],
+            "Age", 'Dim_Employee'[Age],
+            "Solar_Date", 'Dim_Employee'[Solar_Date],
+            "Father_Name", 'Dim_Employee'[Father_Name],
+            "Marital_Status", 'Dim_Employee'[Marital_Status],
+            "Education_Degree", 'Dim_Employee'[Education_Degree],
+            "Education_Field", 'Dim_Employee'[Education_Field],
+            "Employment_Date", 'Dim_Employee'[Employment_Date],
+            "Employment_Solar_Date", 'Dim_Employee'[Employment_Solar_Date],
+            "Leave_Date", 'Dim_Employee'[Leave_Date],
+            "Tenure_Years", 'Dim_Employee'[Tenure_years],
+            "Mobile", 'Dim_Employee'[Mobile],
+            "National_ID", 'Dim_Employee'[National_ID],
+            "Insurance_Number", [Insurance_Number]
+        ),
+        [Employee_Code] = "{employee_code}"
+    )
+EVALUATE ONE
