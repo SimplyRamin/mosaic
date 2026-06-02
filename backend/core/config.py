@@ -16,4 +16,4 @@ class Settings(BaseSettings):
         "env_file": Path(__file__).parent.parent / ".env"
     }
 
-settings = Settings()
+settings = Settings()    # type: ignore
