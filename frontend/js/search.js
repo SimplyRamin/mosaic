@@ -8,6 +8,7 @@ const noResults     = document.getElementById('no-results');
 const cameraBtn     = document.getElementById('camera-btn');
 const cameraSuggest = document.getElementById('camera-suggest-btn');
 const micBtn        = document.getElementById('mic-btn');
+const spinner       = document.getElementById('search-spinner');
 
 // Mock data - replace with API call when backend is ready
 const mockPeople = [
@@ -96,7 +97,7 @@ function showState(state) {
     }
 }
 
-function performSearch(query) {
+async function performSearch(query) {
     query = query.trim();
 
     if (!query) {
@@ -104,26 +105,73 @@ function performSearch(query) {
         return;
     }
 
-    const results = mockPeople.filter(function(person) {
-        return person.name.includes(query)   ||
-               person.role.includes(query)   ||
-               person.department.includes(query)    ||
-               person.id.includes(query);
-    });
+    // Show spinner
+    if (spinner) spinner.classList.remove('hidden');
 
-    resultsList.innerHTML = '';
+    try {
+        const data = await apiCall(`/api/employees/search?q=${encodeURIComponent(query)}`);
 
-    if (results.length === 0) {
-        showState('no-results');
-        return;
+        if (data === null) {
+            // Mock mode - use local filter
+            const results = mockPeople.filter(function(person) {
+                return person.name.includes(query)       ||
+                       person.role.includes(queyr)       ||
+                       person.department.includes(query) ||
+                       person.id.includes(queyr);
+            });
+
+            resultsList.innerHTML = '';
+            if (results.length === 0) {
+                showState('no-results');
+                return;
+            }
+            results.forEach(function(person) {
+                resultsList.appendChild(createResultCard(person));
+            });
+            resultsCount.textContent = results.length + ' نتیجه برای «' + query + '»';
+            showState('results');
+        } else {
+            // Real mode - use API results
+            resultsList.innerHTML = '';
+            if (data.results.length === 0) {
+                showState('no-results');
+                return;
+            }
+            data.results.forEach(function(person) {
+                resultsList.appendChild(createResultCard({
+                    id:          person.Employee_Code,
+                    name:        person.Full_Name,
+                    role:        person.Post,
+                    department:  person.ORG,
+                    initials:    getInitials(person.Full_Name),
+                    avatarColor: getAvatarColor(person.Employee_Code)
+                }));
+            });
+            resultsCount.textContent = data.count + ' نتیجه برای «' + query + '»';
+            showState('results');
+        }
+    } catch(e) {
+        showToast('خطا در دریافت نتایج', 'error');
+        showState('empty');
+    } finally {
+        if (spinner) spinner.classList.add('hidden');
     }
+}
 
-    results.forEach(function(person) {
-        resultsList.appendChild(createResultCard(person));
-    });
+function getInitials(fullName) {
+    if (!fullName) return '?';
+    const parts = fullName.trim().split(' ');
+    if (parts.length === 1) return parts[0].charAt(0);
+    return parts[0].charAt(0) + '' + parts[parts.length - 1].charAt(0);
+}
 
-    resultsCount.textContent = results.length + ' نتیجه برای «' + query + '»';
-    showState('results');
+function getAvatarColor(employeeCode) {
+    const colors = [
+        '#1e3a8a', '#16a34a', '#b8960c',
+        '#64748b', '#9333ea', '#0891b2'
+    ];
+    const index = parseInt(employeeCode) % colors.length;
+    return colors[index] || '#1e3a8a';
 }
 
 // Input handler

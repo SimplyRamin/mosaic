@@ -1,6 +1,6 @@
 // Read the employee id from the URL
 const params     = new URLSearchParams(window.location.search);
-const employeeID = params.get('id');
+const employeeId = params.get('id');
 
 // Mock data - replace with API call when backend is ready
 const mockEmployees = {
@@ -204,20 +204,92 @@ document.getElementById('back-btn').addEventListener('click', function() {
 // Load Profile
 showSkeleton();
 
-if (!employeeID) {
+async function loadProfile() {
+    const data = await apiCall(`/api/employees/${employeeId}`);
+
+    if (data === null) {
+        // Mock mode
+        const employee = mockEmployees[employeeId];
+        setTimeout(function() {
+            if (employee) {
+                renderProfile(employee);
+                document.title = document.title = 'ماکان+ · ' + employee.name;
+            } else {
+                renderNotFound();
+            }
+            hideSkeleton();
+        }, 800);
+    } else {
+        // Real mode - map API response to renderProfile format
+        renderProfile({
+            id:             data.Employee_Code,
+            name:           data.Full_Name,
+            position:       data.Post,
+            department:     data.ORG,
+            company:        data.Company_Name,
+            holding:        data.Holding_Name,
+            initials:       getInitials(data.Full_Name),
+            avatarColor:    getAvatarColor(data.Employee_Code),
+            contact: {
+                mobile:         data.mobile           || '-',
+                workEmail:      '-',
+                workPhone:      '-',
+                officeLocation: data.Work_Loc_Name    || '-'
+            },
+            employment: {
+                employeeId:     data.Employee_Code,
+                hireDate:       data.Employment_Solar_Date || '-',
+                contractType:   '-',
+                status:         data.Is_Active_Text   || '-',
+                workLocation:   data.Work_Loc_Name    || '-'
+            },
+            hr: {
+                gender:         data.Gender_Type      || '-',
+                age:            data.Age              || '-',
+                maritalStatus:  data.Marital_Status   || '-',
+                educationLevel: data.Education_Degree || '-',
+                fieldOfStudy:   data.Education_Field  || '-',
+                nationalId:     data.National_ID      || '-'
+            },
+            compensation: {
+                grossSalary:    '-',
+                netSalary:      '-',
+                salaryGrade:    '-'
+            },
+            attendance: {
+                workHours:      '-',
+                leaveBalance:   '-',
+                overtimeHours:  '-',
+                lateEntries:    '-'
+            }
+        });
+        document.title = 'ماکان+ · ' + data.Full_Name;
+        hideSkeleton();
+    }
+}
+
+function getInitials(fullName) {
+    if (!fullName) return '?';
+    const parts = fullName.trim().split(' ');
+    if (parts.length === 1) return parts[0].charAt(0);
+    return parts[0].charAt(0) + '' + parts[parts.length - 1].charAt(0);
+}
+
+function getAvatarColor(employeeCode) {
+    const colors = [
+        '#1e3a8a', '#16a34a', '#b8960c',
+        '#64748b', '#9333ea', '#0891b2'
+    ];
+    const index = parseInt(employeeCode) % colors.length;
+    return colors[index] || '#1e3a8a';
+}
+
+if (!employeeId) {
     hideSkeleton();
     renderNotFound();
 } else {
-    const employee = mockEmployees[employeeID];
-    if (employee) {
-        // Simulate loading delay so skeleton is visible
-        setTimeout(function() {
-            renderProfile(employee);
-            hideSkeleton();
-            document.title = 'ماکان+ · ' + employee.name;
-        }, 800);
-    } else {
+    loadProfile().catch(function() {
         hideSkeleton();
         renderNotFound();
-    }
+    });
 }

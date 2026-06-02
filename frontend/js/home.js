@@ -162,6 +162,8 @@ document.getElementById('logout-btn').addEventListener('click', function() {
 });
 
 // Render on load
-renderList('people-list', mockTeam);
-renderList('recent-list', mockRecent);
+if (getAppMode() === 'mock') {
+    renderList('people-list', mockTeam);
+    renderList('recent-list', mockRecent);
+}
 renderStats(72, 28);

@@ -105,6 +105,12 @@
   transition: background 0.15s;
 }
 
+.btn-demo--real {
+  background: var(--color-navy-10);
+  border-color: var(--color-navy-20);
+  margin-top: var(--space-xs);
+}
+
 .btn-demo:hover {
   background: var(--color-navy-10);
 }

@@ -5,7 +5,8 @@ const toggleIcon      = document.getElementById('toggle-icon');
 const loginBtn        = document.getElementById('login-btn');
 const errorMessage    = document.getElementById('error-message');
 const demoLogin       = document.getElementById('demo-login');
-const demoBtn         = document.getElementById('demo-btn');
+const mockDemoBtn     = document.getElementById('demo-mock-btn');
+const realDemoBtn     = document.getElementById('demo-real-btn');
 
 // Toggle password visibility
 toggleBtn.addEventListener('click', function() {
@@ -55,12 +56,22 @@ if (typeof DEMO_MODE !== 'undefined' && DEMO_MODE){
     demoLogin.classList.remove('hidden');
 }
 
-demoBtn.addEventListener('click', function() {
+// Mock data demo
+mockDemoBtn.addEventListener('click', function() {
+    setAppMode(DEMO_MODES.MOCK);
     employeeIdInput.value = 'admin';
     passwordInput.value   = 'admin';
-
-    // Small delay so user sees the fields fill in
     setTimeout(function() {
         window.location.href = 'screens/home.html';
-    }, 600)
-})
+    }, 600);
+});
+
+// Real data demo
+realDemoBtn.addEventListener('click', function() {
+    setAppMode(DEMO_MODES.REAL);
+    employeeIdInput.value = 'admin';
+    passwordInput.value   = 'admin';
+    setTimeout(function() {
+        window.location.href = 'screens/home.html';
+    }, 600);
+});

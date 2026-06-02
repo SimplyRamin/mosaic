@@ -1,4 +1,19 @@
 const DEMO_MODE = true;
+const API_BASE  = 'https://localhost:8001';
+
+//Mode: 'mock' = mock data, 'real' = real backend
+const DEMO_MODES = {
+    MOCK: 'mock',
+    REAL: 'real'
+};
+
+function getAppMode() {
+    return localStorage.getItem('app_mode') || DEMO_MODES.MOCK;
+}
+
+function setAppMode(mode) {
+    localStorage.setItem('app_mode', mode);
+}
 
 function renderBottomNav() {
     const currentPage = window.location.pathname.split('/').pop();
@@ -6,6 +21,9 @@ function renderBottomNav() {
     // Pges that should not show bottom navigation
     const noNavPages = ['camera.html'];
     if (noNavPages.includes(currentPage)) return;
+
+    const screen = document.querySelector('.screen');
+    if (!screen) return;
 
     const nav = document.createElement('nav');
     nav.className = 'bottom-nav';
@@ -107,5 +125,21 @@ function showUpdateToast(newVersion) {
         });
     });
 }
+
+async function apiCall(endpoint) {
+    const mode = getAppMode();
+
+    if (mode === DEMO_MODES.MOCK) {
+        return null; // caller handles mock data
+    }
+
+    const response = await fetch(`${API_BASE}${endpoint}`);
+    if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
+    }
+    return response.json();
+}
+
+
 
 checkForUpdates();
