@@ -213,6 +213,13 @@ async function loadProfile() {
         setTimeout(function() {
             if (employee) {
                 renderProfile(employee);
+                saveRecentProfile({
+                    id:          employee.id,
+                    name:        employee.name,
+                    role:        employee.role,
+                    initials:    employee.initials,
+                    avatarColor: employee.avatarColor
+                });
                 document.title = document.title = 'ماکان+ · ' + employee.name;
             } else {
                 renderNotFound();
@@ -262,6 +269,13 @@ async function loadProfile() {
                 overtimeHours:  '-',
                 lateEntries:    '-'
             }
+        });
+        saveRecentProfile({
+            id:          data.Employee_Code,
+            name:        data.Full_Name,
+            role:        data.Post,
+            initials:    getInitials(data.Full_Name),
+            avatarColor: getAvatarColor(data.Employee_Code)
         });
         document.title = 'ماکان+ · ' + data.Full_Name;
         hideSkeleton();

@@ -8,6 +8,33 @@ const DEMO_MODES = {
     MOCK: 'mock',
     REAL: 'real'
 };
+const RECENT_KEY = 'recent_profiles';
+const RECENT_MAX = 5;
+
+function saveRecentProfile(person) {
+    let recent = getRecentProfiles();
+
+    // Remove if already exists
+    recent = recent.filter(function(p) {
+        return p.id !== person.id;
+    });
+
+    // Add to front
+    recent.unshift(person);
+
+    // Keep only last 5
+    recent = recent.slice(0, RECENT_MAX);
+
+    localStorage.setItem(RECENT_KEY, JSON.stringify(recent));
+}
+
+function getRecentProfiles() {
+    try {
+        return JSON.parse(localStorage.getItem(RECENT_KEY)) || [];
+    } catch (e) {
+        return [];
+    }
+}
 
 function getAppMode() {
     return localStorage.getItem('app_mode') || DEMO_MODES.MOCK;

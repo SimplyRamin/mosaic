@@ -228,6 +228,15 @@ document.getElementById('logout-btn').addEventListener('click', function() {
 // Render on load
 if (getAppMode() === 'mock') {
     renderList('people-list', mockTeam);
-    renderList('recent-list', mockRecent);
 }
+
+//Always show real recently viewed from localstorage
+const recentProfiles = getRecentProfiles();
+if (recentProfiles.length > 0) {
+    renderList('recent-list', recentProfiles);
+} else {
+    // Hide the section if empty
+    document.getElementById('recent-section').style.display = 'none';
+}
+
 renderStats(72, 28);
