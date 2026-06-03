@@ -96,61 +96,119 @@ document.getElementById('camera-btn').addEventListener('click', function() {
 });
 
 // Voice search
-const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-const micBtn = document.getElementById('mic-btn');
+const micBtnHome = document.getElementById('mic-btn');
+let mediaRecorderHome = null;
+let audioChunksHome = [];
+let isRecordingHome = false;
 
-if (!SpeechRecognition) {
-    micBtn.style.display = 'none';
-} else {
-    const recognition = new SpeechRecognition();
-    recognition.lang = 'fa-IR';
-    recognition.continuous = false;
-    recognition.interimResults = false;
+async function startHomeRecording() {
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
 
-    // Add this - required for Safari PWA
-    recognition.maxAlternatives = 1;
+        audioChunksHome = [];
+        mediaRecorderHome = new MediaRecorder(stream);
 
-    let isListening = false;
+        mediaRecorderHome.addEventListener('dataavailable', function(e) {
+            if (e.data.size > 0) audioChunksHome.push(e.data);
+        });
 
-    micBtn.addEventListener('click', function() {
-        if (isListening) {
-            recognition.stop();
+        mediaRecorderHome.addEventListener('stop', async function(){
+            const audioBlob = new Blob(audioChunksHome, { type: 'audio/webm' });
+            stream.getTracks().forEach(track => track.stop());
+
+            micBtnHome.disabled = true;
+            showToast('در حال پردازش صدا...', 'info');
+
+            try {
+                const formData = new FormData();
+                formData.append('audio', audioBlob, 'recording.webm');
+
+                const response = await fetch(`${API_BASE}/api/speech/transcribe`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) throw new Error('failed');
+
+                const data = await response.json();
+                if (data.transcript && data.transcript.trim()) {
+                    window.location.href = `search.html?q=${encodeURIComponent(data.transcript.trim())}`;
+                } else {
+                    showToast('صدایی شناسایی نشد', 'info');
+                }
+            } catch (e) {
+                showToast('خطا در پردازش صدا', 'error');
+            } finally {
+                micBtnHome.disabled = false;
+            }
+        });
+
+        mediaRecorderHome.start();
+        isRecordingHome = true;
+        micBtnHome.classList.add('listening');
+
+        setTimeout(function() {
+            if (isRecordingHome) {
+                mediaRecorderHome.stop();
+                isRecordingHome = false;
+                micBtnHome.classList.remove('listening');
+            }
+        }, 5000);
+    } catch (e) {
+        if (e.name === 'NotAllowedError') {
+            showToast('دسترسی به میکروفن رد شده است', 'error');
+        } else {
+            showToast('میکروفن در دسترس نیست', 'error');
+        }
+    }
+}
+
+micBtnHome.addEventListener('click', function() {
+    const mode = getAppMode();
+
+    if (mode === DEMO_MODES.REAL) {
+        if (isRecordingHome) {
+            mediaRecorderHome.stop();
+            isRecordingHome = false;
+            micBtnHome.classList.remove('listening');
+        } else {
+            startHomeRecording();
+        }
+    } else {
+        // Mock mode - web search API
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) {
+            showToast('جستجوی صوتی در دسترس نیست', 'error');
             return;
         }
-        recognition.start();
-    });
 
-    recognition.addEventListener('start', function() {
-        isListening = true;
-        micBtn.classList.add('listening');
-    });
+        const recognition = new SpeechRecognition();
+        recognition.lang = 'fa-IR';
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        recognition.maxAlternatives = 1;
 
-    recognition.addEventListener('result', function(e) {
-        const transcript = e.results[0][0].transcript;
-        // Navigate to search screen with the voice query
-        window.location.href = 'search.html?q=' + encodeURIComponent(transcript);
-    });
+        recognition.addEventListener('start', function() {
+            micBtnHome.classList.add('listening');
+        });
 
-    recognition.addEventListener('end', function() {
-        isListening = false;
-        micBtn.classList.remove('listening');
-    });
+        recognition.addEventListener('result', function(e) {
+            const transcript = e.results[0][0].transcript;
+            window.location.href = `search.html?q=${encodeURIComponent(transcript)}`;
+        });
 
-    recognition.addEventListener('error', function(e) {
-        isListening = false;
-        micBtn.classList.remove('listening');
+        recognition.addEventListener('end', function() {
+            micBtnHome.classList.remove('listening');
+        });
 
-        if (e.error === 'not-allowed') {
-            showToast('دسترسی به میکروفن رد شده است', 'error');
-        } else if (e.error === 'network' || e.error === 'service-not-allowed') {
-            showToast('سرویس جستجوی صوتی در دسترس نیست', 'error');
-        } else if (e.error === 'no-speech') {
-            showToast('صدایی شنیده نشد، دوباره امتحان کنید', 'info');
-        } else {
+        recognition.addEventListener('error', function() {
+            micBtnHome.classList.remove('listening');
             showToast('جستجوی صوتی در دسترس نیست', 'error');
-        }
-    });
-}
+        });
+
+        recognition.start();
+    }
+});
 
 // Logout
 document.getElementById('logout-btn').addEventListener('click', function() {
