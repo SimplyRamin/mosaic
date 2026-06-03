@@ -97,12 +97,17 @@
   background: var(--color-surface);
   border: 0.5px solid var(--color-border);
   border-radius: var(--radius-sm);
-  padding: 2px;
+  padding: 14px;
   font-family: var(--font);
-  font-size: 13px;
+  font-size: 14px;
   color: var(--color-navy);
   cursor: pointer;
   transition: background 0.15s;
+  margin-top: var(--space-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
 }
 
 .btn-demo--real {

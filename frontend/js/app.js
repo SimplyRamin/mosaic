@@ -17,6 +17,12 @@ function setAppMode(mode) {
     localStorage.setItem('app_mode', mode);
 }
 
+function toEnglishNumbers(str) {
+    return str
+        .replace(/[\u06F0-\u06F9]/g, d => d.charCodeAt(0) - 0x06f0)
+        .replace(/[\u0660-\u0669]/g, d => d.charCodeAt(0) - 0x0660);
+}
+
 function renderBottomNav() {
     const currentPage = window.location.pathname.split('/').pop();
 

@@ -98,7 +98,7 @@ function showState(state) {
 }
 
 async function performSearch(query) {
-    query = query.trim();
+    query = toEnglishNumbers(query.trim());
 
     if (!query) {
         showState('empty');
