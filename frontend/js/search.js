@@ -115,9 +115,9 @@ async function performSearch(query) {
             // Mock mode - use local filter
             const results = mockPeople.filter(function(person) {
                 return person.name.includes(query)       ||
-                       person.role.includes(queyr)       ||
+                       person.role.includes(query)       ||
                        person.department.includes(query) ||
-                       person.id.includes(queyr);
+                       person.id.includes(query);
             });
 
             resultsList.innerHTML = '';
