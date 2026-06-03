@@ -5,9 +5,23 @@
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from contextlib import asynccontextmanager
 from routers import employees, speech
+from core.name_cache import load_names
+from core.whisper_model import load_model
+import threading
 
-app = FastAPI(title="Makan+ API", version="1.0.0")
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    load_model()
+    # Load name cache in background thread on startup
+    thread = threading.Thread(target=load_names, daemon=True)
+    thread.start()
+    yield
+
+
+app = FastAPI(title="Makan+ API", version="1.0.0", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -19,6 +33,7 @@ app.add_middleware(
 
 app.include_router(employees.router)
 app.include_router(speech.router)
+
 
 @app.get("/health")
 def health():

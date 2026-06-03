@@ -14,5 +14,6 @@ dependencies = [
     "python-jose>=3.5.0",
     "python-multipart>=0.0.30",
     "pywin32>=311",
+    "rapidfuzz>=3.14.5",
     "uvicorn>=0.48.0",
 ]

@@ -266,10 +266,15 @@ async function sendAudioToWhisper(audioBlob) {
 
         const data = await response.json()
 
-        if (data.transcript && data.transcript.trim()) {
-            searchInput.value = data.transcript.trim();
+        // Use matched name if confidence is good, otherwise use raw transcript
+        const searchTerm = data.match_score >= 65
+            ? data.matched_name
+            : data.transcript;
+        
+        if (searchTerm && searchTerm.trim()) {
+            searchInput.value = searchTerm.trim();
             clearBtn.classList.add('visible');
-            performSearch(data.transcript.trim())
+            performSearch(searchTerm.trim());
         } else {
             showToast('صدایی شناسایی نشد', 'info');
         }

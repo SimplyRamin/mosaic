@@ -131,11 +131,17 @@ async function startHomeRecording() {
                 if (!response.ok) throw new Error('failed');
 
                 const data = await response.json();
-                if (data.transcript && data.transcript.trim()) {
-                    window.location.href = `search.html?q=${encodeURIComponent(data.transcript.trim())}`;
+                
+                const searchTerm = data.match_score >= 65
+                    ? data.matched_name
+                    : data.transcript;
+                
+                if (searchTerm && searchTerm.trim()) {
+                    window.location.href = `search.html?q=${encodeURIComponent(searchTerm.trim())}`;
                 } else {
-                    showToast('صدایی شناسایی نشد', 'info');
+                    showToast('صدایی شناسایی نشد', 'info')
                 }
+
             } catch (e) {
                 showToast('خطا در پردازش صدا', 'error');
             } finally {
