@@ -66,6 +66,7 @@ def start_backend():
         [
             "uv", "run", "uvicorn", "main:app",
             "--reload",
+            "--host", "0.0.0.0",
             "--port", str(BACKEND_PORT),
             "--ssl-keyfile", str(KEY),
             "--ssl-certfile", str(CERT)
