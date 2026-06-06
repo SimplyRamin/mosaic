@@ -106,6 +106,14 @@ def login(body: LoginRequest, request: Request):
         (user['User_id'], device_name)
     )
 
+    # Cleanup expired and revoked sessions for this user
+    execute_sql(
+        f"DELETE FROM {SCHEMA}.Sessions "
+        f"WHERE User_id = ? AND "
+        f"(Expires_at < GETDATE() OR Revoked_at IS NOT NULL)",
+        (user['User_id'],)
+    )
+
     execute_sql(
         f"INSERT INTO {SCHEMA}.Sessions "
         f"(User_id, Refresh_token, Device_name, Device_os, Ip_address, "
