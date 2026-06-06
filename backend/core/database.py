@@ -3,6 +3,7 @@
 #                                   for Tabiat Makan Industrial Group
 # =================================================================================================
 
+import pyodbc
 import win32com.client
 import pythoncom
 from core.config import settings
@@ -10,6 +11,8 @@ from pathlib import Path
 
 QUERIES_DIR = Path(__file__).parent.parent / "queries"
 
+
+# -------------------------- Analysis Services (DAX) ------------------------- #
 
 def get_as_connection():
     conn = win32com.client.Dispatch("ADODB.Connection")
@@ -23,20 +26,10 @@ def get_as_connection():
     return conn
 
 
-def load_query(filename: str, **kwargs) -> str:
-    path = QUERIES_DIR / filename
-    query = path.read_text(encoding="utf-8")
-    # Replace placeholder with actual values
-    for key, value in kwargs.items():
-        query = query.replace(f"{{{key}}}", str(value))
-    return query
-
-
 def run_dax(query: str) -> list[dict]:
     pythoncom.CoInitialize()
     try:
         conn = get_as_connection()
-
         recordset = win32com.client.Dispatch("ADODB.Recordset")
         recordset.Open(query, conn)
 
@@ -64,3 +57,53 @@ def run_dax(query: str) -> list[dict]:
     
     finally:
         pythoncom.CoUninitialize()
+
+
+def load_query(filename: str, **kwargs) -> str:
+    path = QUERIES_DIR / filename
+    query = path.read_text(encoding="utf-8")
+    # Replace placeholder with actual values
+    for key, value in kwargs.items():
+        query = query.replace(f"{{{key}}}", str(value))
+    return query
+
+
+# --------------------------- SQL Server (MakanAPP) -------------------------- #
+
+def get_sql_connection():
+    conn_str = (
+        f"DRIVER={{ODBC Driver 17 for SQL Server}};"
+        f"SERVER={settings.sql_server};"
+        f"DATABASE={settings.sql_database};"
+        f"UID={settings.sql_username};"
+        f"PWD={settings.sql_password};"
+    )
+    return pyodbc.connect(conn_str)
+
+
+def run_sql(query: str, params: tuple = ()) -> list[dict]:
+    # This function is for SELECT queries
+    conn = get_sql_connection()
+    cursor = conn.cursor()
+    cursor.execute(query, params)
+
+    rows = cursor.fetchall()
+    columns = [col[0] for col in cursor.description]
+
+    result = []
+    for row in rows:
+        result.append(dict(zip(columns, tuple(row))))
+
+    conn.close()
+    return result
+
+
+def execute_sql(query: str, params: tuple = ()) -> int:
+    # This function is for INSERT/UPDATE/DELETE queries
+    conn = get_sql_connection()
+    cursor = conn.cursor()
+    cursor.execute(query, params)
+    conn.commit()
+    affected = cursor.rowcount
+    conn.close()
+    return affected
