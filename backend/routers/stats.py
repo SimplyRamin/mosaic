@@ -40,4 +40,7 @@ def get_home_stats():
     except HTTPException:
         raise
     except Exception as e:
+        print(f"Stats error: {type(e).__name__}: {e}")
+        import traceback
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
