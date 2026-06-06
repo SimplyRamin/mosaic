@@ -6,7 +6,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
-from routers import employees, speech
+from routers import employees, speech, stats
 from core.name_cache import load_names
 from core.whisper_model import load_model
 import threading
@@ -33,6 +33,7 @@ app.add_middleware(
 
 app.include_router(employees.router)
 app.include_router(speech.router)
+app.include_router(stats.router)
 
 
 @app.get("/health")

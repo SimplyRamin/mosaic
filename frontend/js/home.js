@@ -72,15 +72,6 @@ function renderStats(malePercent, femalePercent) {
     document.getElementById('female-fill').style.width = femalePercent + '%';
 }
 
-// Chip filter logic
-const chips = document.querySelectorAll('.chip');
-chips.forEach(function(chip) {
-    chip.addEventListener('click', function() {
-        chips.forEach(function(c) { c.classList.remove('active'); });
-        this.classList.add('active');
-        // TODO: filter logic when real data is connected
-    });
-});
 
 // Search - navigate to search screen with query
 const searchInput = document.getElementById('search-input');
@@ -169,6 +160,59 @@ async function startHomeRecording() {
     }
 }
 
+// Loading Home stats
+async function loadHomeStats() {
+    const data = await apiCall('/api/stats/home');
+
+    if (data === null) {
+        // Mock mode - use hardcoded values
+        renderStats(72, 28);
+        document.getElementById('avg-age').textContent = '۳۴';
+        document.getElementById('avg-tenure').textContent = '۳';
+        return;
+    }
+
+    // Update existing stat card
+    document.getElementById('active-count').textContent =
+        data.total_active.toLocaleString('fa-IR');
+    document.getElementById('male-percent').textContent = data.male_percent + '٪';
+    document.getElementById('female-percent').textContent = data.female_percent + '٪';
+    document.getElementById('male-fill').style.width = data.male_percent + '%';
+    document.getElementById('female-fill').style.width = data.female_percent + '%';
+
+    // New metrics
+    document.getElementById('avg-age').textContent =
+        data.avg_age.toLocaleString('fa-IR');
+    document.getElementById('avg-tenure').textContent = 
+        data.avg_tenure.toLocaleString('fa-IR');
+
+    // Top departments
+    const deptList = document.getElementById('dept-list');
+    const maxCount = data.top_departments[0].count;
+
+    data.top_departments.forEach(function(dept) {
+        const pct = (dept.count / maxCount * 100).toFixed(1);
+
+        const item = document.createElement('div');
+        item.className = 'dept-item';
+        item.innerHTML = `
+            <span class="dept-name">${dept.name}</span>
+            <div class="dept-bar-wrap">
+                <div class="dept-bar-fill" style="width:0%" data-width="${pct}%"></div>
+            </div>
+            <span class="dept-count">${dept.count.toLocaleString('fa-IR')}</span>
+        `;
+        deptList.appendChild(item);
+    });
+
+    // Animate bars after render
+    setTimeout(function() {
+        document.querySelectorAll('.dept-bar-fill').forEach(function(bar) {
+            bar.style.width = bar.dataset.width;
+        });
+    }, 100);
+}
+
 micBtnHome.addEventListener('click', function() {
     const mode = getAppMode();
 
@@ -239,4 +283,4 @@ if (recentProfiles.length > 0) {
     document.getElementById('recent-section').style.display = 'none';
 }
 
-renderStats(72, 28);
+loadHomeStats();

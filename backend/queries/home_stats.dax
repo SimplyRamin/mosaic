@@ -1,0 +1,44 @@
+DEFINE
+
+VAR TotalActive =
+	CALCULATE(
+		COUNTROWS('Dim_Employee'),
+		'Dim_Employee'[Is_Active_Text] = "فعال"
+	)
+
+VAR TotalMale = 
+	CALCULATE(
+		COUNTROWS('Dim_Employee'),
+		'Dim_Employee'[Is_Active_Text] = "فعال",
+		'Dim_Employee'[Gender_Type] = "مرد"
+	)
+
+VAR TotalFemale = 
+	CALCULATE(
+		COUNTROWS('Dim_Employee'),
+		'Dim_Employee'[Is_Active_Text] = "فعال",
+		'Dim_Employee'[Gender_Type] = "زن"
+	)
+
+VAR AvgAge = 
+	CALCULATE(
+		AVERAGEX('Dim_Employee', 'Dim_Employee'[Age]),
+		'Dim_Employee'[Is_Active_Text] = "فعال"
+	)
+
+VAR AvgTenure = 
+	CALCULATE(
+		AVERAGEX('Dim_Employee', 'Dim_Employee'[Tenure_years]),
+		'Dim_Employee'[Is_Active_Text] = "فعال"
+	)
+
+EVALUATE
+ROW(
+	"TotalActive",	 TotalActive,
+	"TotalMale",	 TotalMale,
+	"TotalFemale",	 TotalFemale,
+	"MalePercent",	 ROUND(DIVIDE(TotalMale, TotalActive, 0) * 100, 1),
+	"FemalePercent", ROUND(DIVIDE(TotalFemale, TotalActive, 0) * 100, 1),
+	"AvgAge",		 ROUND(AvgAge, 1),
+	"AvgTenure",	 ROUND(AvgTenure, 1)
+)

@@ -1,0 +1,21 @@
+EVALUATE
+TOPN(
+	5,
+	ADDCOLUMNS(
+		SUMMARIZE(
+			FILTER(
+				'Dim_Employee',
+				'Dim_Employee'[Is_Active_Text] = "فعال"
+			),
+			'Dim_Employee'[ORG]
+		),
+		"Count",
+		CALCULATE(
+			COUNTROWS('Dim_Employee'),
+			'Dim_Employee'[Is_Active_Text] = "فعال"
+		)
+	),
+	[Count],
+	DESC
+)
+ORDER BY [Count] DESC
