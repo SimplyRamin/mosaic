@@ -72,6 +72,36 @@ function renderStats(malePercent, femalePercent) {
     document.getElementById('female-fill').style.width = femalePercent + '%';
 }
 
+function getInitials(fullName) {
+    if (!fullName) return '?';
+    const parts = fullName.trim().split(' ');
+    if (parts.length === 1) return parts[0].charAt(0);
+    return parts[0].charAt(0) + '' + parts[parts.length - 1].charAt(0);
+}
+
+// Show real user name from stored user object
+async function loadUserGreeting() {
+    const storedUser = localStorage.getItem('user');
+        
+    if (!storedUser) return;
+
+    const user = JSON.parse(storedUser);
+
+    if (getAppMode() === DEMO_MODES.REAL) {
+        try {
+            const data = await apiCall(`/api/employees/${user.employee_code}`);
+            if (data && data.Full_Name) {
+                document.getElementById('user-name').textContent = data.Full_Name;
+                // Update avatar initials
+                document.getElementById('user-avatar').textContent = getInitials(data.Full_Name);
+            }
+        } catch (e) {
+            document.getElementById('user-name').textContent = user.username;
+        }
+    } else {
+        document.getElementById('user-name'),textContent = 'رامین فردوس';
+    }
+}
 
 // Search - navigate to search screen with query
 const searchInput = document.getElementById('search-input');
@@ -262,10 +292,25 @@ micBtnHome.addEventListener('click', function() {
 
 // Logout
 document.getElementById('logout-btn').addEventListener('click', function() {
-    // TODO: call logout API when backend is ready
-    // for now just redirect to login
     if (confirm('آیا می‌خواهید از سامانه خارج شوید؟')) {
-        window.location.href = '../index.html';
+        const refreshToken = localStorage.getItem('refresh_token');
+        const accessToken  = localStorage.getItem('access_token');
+
+        // Call logout API
+        fetch(`${API_BASE}/api/auth/logout`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${accessToken}`
+            },
+            body: JSON.stringify({ refresh_token: refreshToken })
+        }).finally(function() {
+            // Clear storage and redirect regardless of API response
+            localStorage.removeItem('access_token');
+            localStorage.removeItem('refresh_token');
+            localStorage.removeItem('user');
+            window.location.href = '../index.html';
+        });
     }
 });
 
@@ -283,4 +328,5 @@ if (recentProfiles.length > 0) {
     document.getElementById('recent-section').style.display = 'none';
 }
 
+loadUserGreeting();
 loadHomeStats();

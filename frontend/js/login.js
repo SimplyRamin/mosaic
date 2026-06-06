@@ -42,12 +42,44 @@ loginBtn.addEventListener('click', function() {
     loginBtn.disabled = true;
     loginBtn.textContent = 'در حال ورود...';
 
-    // TODO: replace with the real API call when backend is ready
-    setTimeout(function() {
+    fetch(`${API_BASE}/api/auth/login`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Device-Name': navigator.userAgent.includes('iPhone') ? 'iPhone' : 'Desktop',
+            'X-Device-OS': navigator.platform || 'Unknown'
+        },
+        body: JSON.stringify({
+            employee_code: toEnglishNumbers(employeeId),
+            password: password
+        })
+    })
+    .then(function(response) {
+        return response.json().then(function(data) {
+            return { status: response.status, data: data };
+        });
+    })
+    .then(function(result) {
         loginBtn.disabled = false;
         loginBtn.textContent = 'ورود به سامانه';
-        errorMessage.textContent = 'کد پرسنلی یا رمز عبور اشتباه است'
-    }, 1500);
+
+        if (result.status === 200) {
+            // Store tokens
+            localStorage.setItem('access_token', result.data.access_token);
+            localStorage.setItem('refresh_token', result.data.refresh_token);
+            localStorage.setItem('user', JSON.stringify(result.data.user));
+
+            // Navigate to home
+            window.location.href = 'screens/home.html';
+        } else {
+            errorMessage.textContent = result.data.detail || 'خطا در ورود به سامانه';
+        }
+    })
+    .catch(function() {
+        loginBtn.disabled = false;
+        loginBtn.textContent = 'ورود به سامانه';
+        errorMessage.textContent = 'خطا در اتصال به سرور';
+    });
 })
 
 // Show demo button only in demo mode
@@ -69,9 +101,9 @@ mockDemoBtn.addEventListener('click', function() {
 // Real data demo
 realDemoBtn.addEventListener('click', function() {
     setAppMode(DEMO_MODES.REAL);
-    employeeIdInput.value = 'admin';
-    passwordInput.value   = 'admin';
+    employeeIdInput.value = '210197';
+    passwordInput.value   = 'demo1234';
     setTimeout(function() {
-        window.location.href = 'screens/home.html';
+        loginBtn.click();
     }, 600);
 });

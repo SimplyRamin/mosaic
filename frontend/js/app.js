@@ -168,11 +168,63 @@ async function apiCall(endpoint) {
         return null; // caller handles mock data
     }
 
-    const response = await fetch(`${API_BASE}${endpoint}`);
-    if (!response.ok) {
-        throw new Error(`API error: ${response.status}`);
+    const token = localStorage.getItem('access_token');
+
+    const response = await fetch(`${API_BASE}${endpoint}`, {
+        header: {
+            'Authorization': token ? `Bearer ${token}` : ''
+        }
+    });
+
+    if (response.status === 401) {
+        // Token expired - try to refresh
+        const refreshed = await refreshAcessToken();
+        if (refreshed) {
+            // Retry the original request with new token
+            const newToken = localStorage.getItem('access_token');
+            const retryResponse = await fetch(`${API_BASE}${endpoint}`, {
+                headers: {
+                    'Authorization': `Bearer ${newToken}`
+                }
+            });
+            if (!retryResponse.ok) throw new Error(`API error: ${retryResponse.status}`);
+            return retryResponse.json();
+        } else {
+            // Refresh failed - redirect to login
+            window.location.href = getBasePath() + 'index.html';
+            return null;
+        }
     }
+
+    if (!response.ok) throw new Error(`API Error: ${response.status}`);
     return response.json();
+}
+
+async function refreshAccessToken() {
+    const refreshToken = localStorage.getItem('refresh_token');
+    if (!refreshToken) return false;
+
+    try {
+        const response = await fetch(`${API_BASE}/api/auth/refresh`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ refresh_token: refreshToken })
+        });
+
+        if (!response.ok) return false;
+
+        const data = await response.json();
+        localStorage.setItem('access_token', data.access_token);
+        return true;
+
+    } catch (e) {
+        return false;
+    }
+}
+
+function getBasePath() {
+    const path = window.location.pathname;
+    return path.includes('/screens/') ? '../' : '';
 }
 
 
