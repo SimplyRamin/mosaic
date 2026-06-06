@@ -8,6 +8,7 @@ const demoLogin       = document.getElementById('demo-login');
 const mockDemoBtn     = document.getElementById('demo-mock-btn');
 const realDemoBtn     = document.getElementById('demo-real-btn');
 
+
 // Toggle password visibility
 toggleBtn.addEventListener('click', function() {
     if (passwordInput.type === 'password') {

@@ -33,6 +33,9 @@ const mockRecent = [
     }
 ];
 
+if (!requireAuth()) throw new Error('Not authenticated');
+
+
 function createPersonCard(person) {
     const card = document.createElement('div');
     card.className = 'person-card';

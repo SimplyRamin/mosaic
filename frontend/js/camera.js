@@ -21,6 +21,8 @@ let currentStream   = null;
 let facingMode      = 'environment'; // back camera by default
 let capturedImageData = null;
 
+if (!requireAuth()) throw new Error('Not authenticated');
+
 /* ------------------------------ Camera Setup ------------------------------ */
 
 async function startCamera() {

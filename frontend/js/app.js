@@ -191,7 +191,7 @@ async function apiCall(endpoint) {
             return retryResponse.json();
         } else {
             // Refresh failed - redirect to login
-            window.location.href = getBasePath() + 'index.html';
+            window.location.replace(getBasePath() + 'index.html');
             return null;
         }
     }
@@ -225,6 +225,24 @@ async function refreshAccessToken() {
 function getBasePath() {
     const path = window.location.pathname;
     return path.includes('/screens/') ? '../' : '';
+}
+
+function requireAuth() {
+    const token = localStorage.getItem('access_token');
+    const user  = localStorage.getItem('user');
+
+    if (!token || !user) {
+        const currentPage = window.location.pathname;
+        // Don't redirect if already on login page
+        if (!currentPage.includes('index.html') && currentPage !== '/') {
+            localStorage.removeItem('access_token');
+            localStorage.removeItem('refresh_token');
+            localStorage.removeItem('user');
+            window.location.replace(getBasePath() + 'index.html');
+        }
+        return false;
+    }
+    return true;
 }
 
 

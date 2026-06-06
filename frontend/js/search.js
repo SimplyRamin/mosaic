@@ -10,6 +10,8 @@ const cameraSuggest = document.getElementById('camera-suggest-btn');
 const micBtn        = document.getElementById('mic-btn');
 const spinner       = document.getElementById('search-spinner');
 
+if (!requireAuth()) throw new Error('Not authenticated');
+
 // Mock data - replace with API call when backend is ready
 const mockPeople = [
     {

@@ -2,6 +2,8 @@
 const params     = new URLSearchParams(window.location.search);
 const employeeId = params.get('id');
 
+if (!requireAuth()) throw new Error('Not authenticated');
+
 // Mock data - replace with API call when backend is ready
 const mockEmployees = {
     '100000': {

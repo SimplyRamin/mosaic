@@ -1,4 +1,4 @@
-// Version: 2025-06-06-003
+// Version: 2025-06-06-006
 const CACHE_VERSION = 'makanplus-v2';
 const CACHE_NAME = `makanplus-${CACHE_VERSION}`;
 
@@ -59,11 +59,13 @@ self.addEventListener('activate', function(e) {
 });
 
 self.addEventListener('fetch', function(e) {
+    // Skip non-http requests (chrome-extension, etc.)
+    if (!e.request.url.startsWith('http')) return;
+
     // Always fetch fresh: API calls and version check
-    if (e.request.url.includes('/api/') ||
-        e.request.url.includes('version.json')) {
-        return;
-    }
+    if (e.request.url.includes('/api/')) return;
+
+    if (e.request.url.includes('version.json')) return;
 
     const isHTML = e.request.headers.get('accept') &&
                    e.request.headers.get('accept').includes('text/html');
