@@ -3,14 +3,18 @@
 #                                   for Tabiat Makan Industrial Group
 # =================================================================================================
 
-from fastapi import APIRouter, Query, HTTPException
+from fastapi import APIRouter, Query, HTTPException, Depends
 from core.database import run_dax, load_query
+from core.auth import get_current_user
 
 router = APIRouter(prefix="/api/employees", tags=["employees"])
 
 
 @router.get("/search")
-def search_employees(q: str = Query(..., min_length=1)):
+def search_employees(
+    q: str = Query(..., min_length=1),
+    current_user: dict = Depends(get_current_user)
+    ):
     q_clean = q.replace("'", "''").replace("'", '')
 
     try:
@@ -22,7 +26,10 @@ def search_employees(q: str = Query(..., min_length=1)):
 
 
 @router.get("/{employee_code}")
-def get_employee(employee_code: str):
+def get_employee(
+    employee_code: str,
+    current_user: dict = Depends(get_current_user)
+    ):
     clean_code = employee_code.replace("'", "''")
 
     try:

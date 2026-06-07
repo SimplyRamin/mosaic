@@ -3,9 +3,10 @@
 #                                   for Tabiat Makan Industrial Group
 # =================================================================================================
 
-from fastapi import APIRouter, UploadFile, File, HTTPException
+from fastapi import APIRouter, UploadFile, File, HTTPException, Depends
 from core.whisper_model import get_model
 from core.name_cache import find_closest_name
+from core.auth import get_current_user
 import tempfile
 import os
 
@@ -13,7 +14,10 @@ router = APIRouter(prefix="/api/speech", tags=["speech"])
 
 
 @router.post("/transcribe")
-async def transcribe(audio: UploadFile = File(...)):
+async def transcribe(
+    audio: UploadFile = File(...),
+    current_user: dict = Depends(get_current_user)
+    ):
     model = get_model()
     if model is None:
         raise HTTPException(status_code=503, detail="Speech model not ready yet")

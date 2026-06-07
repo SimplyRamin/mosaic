@@ -2,14 +2,15 @@
 #                                           Written by Ramin F.
 #                                   for Tabiat Makan Industrial Group
 # =================================================================================================
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from core.database import run_dax, load_query
+from core.auth import get_current_user
 
 router = APIRouter(prefix="/api/stats", tags=["stats"])
 
 
 @router.get("/home")
-def get_home_stats():
+def get_home_stats(current_user: dict = Depends(get_current_user)):
     try:
         overview    = run_dax(load_query("home_stats.dax"))
         departments = run_dax(load_query("top_departments.dax"))

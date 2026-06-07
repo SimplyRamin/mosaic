@@ -178,7 +178,7 @@ async function apiCall(endpoint) {
 
     if (response.status === 401) {
         // Token expired - try to refresh
-        const refreshed = await refreshAcessToken();
+        const refreshed = await refreshAccessToken();
         if (refreshed) {
             // Retry the original request with new token
             const newToken = localStorage.getItem('access_token');
