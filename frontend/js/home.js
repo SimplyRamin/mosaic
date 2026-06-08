@@ -104,6 +104,17 @@ async function loadUserGreeting() {
     } else {
         document.getElementById('user-name'),textContent = 'رامین فردوس';
     }
+
+    // Click handler - navigate to logged in user's own profile
+    const avatarEl = document.getElementById('user-avatar');
+    const nameEl   = document.getElementById('user-name');
+
+    function goToMyProfile() {
+        window.location.href = `profile.html?id=${user.employee_code}`;
+    }
+
+    avatarEl.addEventListener('click', goToMyProfile);
+    nameEl.addEventListener('click',   goToMyProfile);
 }
 
 // Search - navigate to search screen with query
@@ -147,8 +158,12 @@ async function startHomeRecording() {
                 const formData = new FormData();
                 formData.append('audio', audioBlob, 'recording.webm');
 
+                const token = localStorage.getItem('access_token');
                 const response = await fetch(`${API_BASE}/api/speech/transcribe`, {
                     method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    },
                     body: formData
                 });
 

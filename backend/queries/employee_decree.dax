@@ -1,0 +1,62 @@
+DEFINE
+    VAR __SQDS0FilterTable =
+        TREATAS({ {employee_id} }, Fact_Commission[Employee_ID])
+    VAR __DS0FilterTable3 =
+        TREATAS(
+            { CALCULATE(MAX(Fact_Commission[Commission_Efect_Date]), Fact_Commission[Employee_ID] = {employee_id}) },
+            Fact_Commission[Commission_Efect_Date]
+        )
+    VAR __DS0Core =
+        SELECTCOLUMNS(
+            KEEPFILTERS(
+                FILTER(
+                    KEEPFILTERS(
+                        SUMMARIZECOLUMNS(
+                            'Dim_Employee'[Employee_Code],
+                            'Fact_Commission'[Unique_Commission_Type_Description],
+                            'Dim_Employee'[Employee_ID_BK],
+                            'Fact_Commission'[WorkLocation_Title],
+                            'Fact_Commission'[ORG_Chart_Description],
+                            'Fact_Commission'[Commission_Efect_Date],
+                            'Fact_Commission'[Solar_Date],
+                            __SQDS0FilterTable,
+                            __DS0FilterTable3,
+                            "CountRowsFact_Commission", COUNTROWS('Fact_Commission')
+                        )
+                    ),
+                    OR(
+                        OR(
+                            OR(
+                                OR(
+                                    OR(
+                                        OR(
+                                            NOT(ISBLANK('Dim_Employee'[Employee_Code])),
+                                            NOT(ISBLANK('Fact_Commission'[Unique_Commission_Type_Description]))
+                                        ),
+                                        NOT(ISBLANK('Dim_Employee'[Employee_ID_BK]))
+                                    ),
+                                    NOT(ISBLANK('Fact_Commission'[WorkLocation_Title]))
+                                ),
+                                NOT(ISBLANK('Fact_Commission'[ORG_Chart_Description]))
+                            ),
+                            NOT(ISBLANK('Fact_Commission'[Commission_Efect_Date]))
+                        ),
+                        NOT(ISBLANK('Fact_Commission'[Solar_Date]))
+                    )
+                )
+            ),
+            "Employee_Code",    'Dim_Employee'[Employee_Code],
+            "Commission_Type",  'Fact_Commission'[Unique_Commission_Type_Description],
+            "Employee_ID",      'Dim_Employee'[Employee_ID_BK],
+            "Work_Location",    'Fact_Commission'[WorkLocation_Title],
+            "ORG_Chart",        'Fact_Commission'[ORG_Chart_Description],
+            "Effect_Date",      'Fact_Commission'[Commission_Efect_Date],
+            "Solar_Date",       'Fact_Commission'[Solar_Date],
+            "Month_To_Date",
+                DATEDIFF(
+                    'Fact_Commission'[Commission_Efect_Date],
+                    TODAY(),
+                    MONTH
+                )
+        )
+EVALUATE __DS0Core

@@ -1,0 +1,24 @@
+DEFINE
+    VAR __TargetMonth =
+        CALCULATE(
+            MAX('Fact_Att_Calc'[Date_ID]),
+            FILTER('Fact_Att_Calc', 'Fact_Att_Calc'[Employee_ID] = {employee_id})
+        )
+    VAR __DS0FilterTable =
+        FILTER(
+            KEEPFILTERS(VALUES('Fact_Att_Calc'[Employee_ID])),
+            'Fact_Att_Calc'[Employee_ID] = {employee_id}
+        )
+    VAR __DS0FilterTable2 =
+        TREATAS({ __TargetMonth }, 'Fact_Att_Calc'[Date_ID])
+    VAR __DS0Core =
+        SUMMARIZECOLUMNS(
+            'Fact_Att_Calc'[Employee_ID],
+            'Fact_Att_Calc'[Date_ID],
+            'Fact_Att_Calc'[Attendance_Factor_Title],
+            __DS0FilterTable,
+            __DS0FilterTable2,
+            "SumValue", SUM('Fact_Att_Calc'[Value])
+        )
+EVALUATE
+__DS0Core

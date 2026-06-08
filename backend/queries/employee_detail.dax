@@ -9,6 +9,7 @@ VAR ONE =
                         SELECTEDVALUE('Fact_Employee_Insurance'[Insurance_Number])
                     )
             ),
+            "Employee_ID", 'Dim_Employee'[Employee_ID_BK],
             "Employee_Code", 'Dim_Employee'[Employee_Code],
             "Holding_Name", 'Dim_Employee'[Holding_Name],
             "Corporation_ID", 'Dim_Employee'[Corporation_ID],

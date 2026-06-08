@@ -66,7 +66,12 @@ function renderBottomNav() {
     const items = [
         { icon: 'icon-home',    label: 'خانه',    href: 'home.html' },
         { icon: 'icon-search',  label: 'جستجو',   href: 'search.html' },
-        { icon: 'icon-user',    label: 'پروفایل', href: 'profile.html' }
+        { icon: 'icon-user',    label: 'پروفایل', href: (function() {
+            const user = localStorage.getItem('user');
+            if (!user) return 'profile.html';
+            const parsed = JSON.parse(user);
+            return 'profile.html?id=' + parsed.employee_code
+        })() }
     ];
 
     items.forEach(function(item) {
@@ -171,7 +176,7 @@ async function apiCall(endpoint) {
     const token = localStorage.getItem('access_token');
 
     const response = await fetch(`${API_BASE}${endpoint}`, {
-        header: {
+        headers: {
             'Authorization': token ? `Bearer ${token}` : ''
         }
     });

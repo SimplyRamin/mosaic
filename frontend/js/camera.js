@@ -21,7 +21,7 @@ let currentStream   = null;
 let facingMode      = 'environment'; // back camera by default
 let capturedImageData = null;
 
-if (!requireAuth()) throw new Error('Not authenticated');
+// if (!requireAuth()) throw new Error('Not authenticated');
 
 /* ------------------------------ Camera Setup ------------------------------ */
 
@@ -46,6 +46,7 @@ async function startCamera() {
 
         currentStream = stream;
         video.srcObject = stream;
+        video.play();
         video.classList.remove('hidden');
         unavailable.classList.add('hidden');
         scanFrame.style.opacity = '1';

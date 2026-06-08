@@ -259,8 +259,12 @@ async function sendAudioToWhisper(audioBlob) {
         const formData = new FormData();
         formData.append('audio', audioBlob, 'recording.webm');
 
+        const token = localStorage.getItem('access_token');
         const response = await fetch(`${API_BASE}/api/speech/transcribe`, {
             method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            },
             body: formData
         });
 

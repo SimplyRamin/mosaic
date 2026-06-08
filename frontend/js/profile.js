@@ -92,6 +92,23 @@ const mockEmployees = {
     }
 };
 
+function formatCurrency(value) {
+    if (value === null || value === undefined) return '-';
+    const num = Math.round(Number(value) / 10); // Rial to Toman
+    return num.toLocaleString('fa-IR') + ' تومان';
+}
+
+function formatMinutes(value) {
+    if (value === null || value === undefined) return '-';
+    const mins = Math.round(Number(value));
+    if (mins === 0) return '۰';
+    const h = Math.floor(mins / 60);
+    const m = mins % 60;
+    if (h === 0 ) return m.toLocaleString('fa-IR') + "دقیقه";
+    if (m === 0 ) return h.toLocaleString('fa-IR') + "ساعت";
+    return h.toLocaleString('fa-IR') + ' ساعت و ' + m.toLocaleString('fa-IR') + ' دقیقه';
+}
+
 function createInfoRow( icon, label, value, highlight) {
     const row = document.createElement('div');
     row.className = 'info-row';
@@ -206,6 +223,65 @@ document.getElementById('back-btn').addEventListener('click', function() {
 // Load Profile
 showSkeleton();
 
+function renderSalary(salary) {
+    const list = document.getElementById('compensation-list');
+    list.innerHTML = '';
+    list.appendChild(createInfoRow('icon-shield-check', 'حقوق ناخالص',     formatCurrency(salary.Gross_Salary),        true));
+    list.appendChild(createInfoRow('icon-shield-check', 'پرداختی خالص',    formatCurrency(salary.Net_Salary),          true));
+    list.appendChild(createInfoRow('icon-shield-check', 'حقوق پایه',       formatCurrency(salary.Base_Salary),         false));
+    list.appendChild(createInfoRow('icon-shield-check', 'مالیات',          formatCurrency(salary.Tax_Deduction),       false));
+    list.appendChild(createInfoRow('icon-shield-check', 'بیمه سهم کارمند', formatCurrency(salary.Insurance_Employee),  false));
+}
+
+function renderDecree(decreeList) {
+    const list = document.getElementById('attendance-list');
+    list.closest('.profile-section').querySelector('.profile-section-title').textContent = 'سوابق حکمی';
+    list.innerHTML = '';
+
+    if (!decreeList || decreeList.length === 0) {
+        list.appendChild(createInfoRow('icon-shield-check', 'اطلاعاتی یافت نشد', 'حکم', false));
+        return;
+    }
+
+    decreeList.forEach(function(d) {
+        const label = (d.Commission_Type || '-') + ' · ' + (d.Solar_Date || '-');
+        const value = (d.ORG_Chart || '-') + ' · ' + (d.Work_Location || '-');
+        list.appendChild(createInfoRow('icon-shield-check', label, value, false));
+    });
+}
+
+function renderAttendance(attendanceList) {
+    if (!attendanceList || attendanceList.length === 0) return;
+
+    // Find or create attendance section after decree section
+    let attSection = document.getElementById('attendance-extra-section');
+    if (!attSection) {
+        const divider = document.createElement('div');
+        divider.className = 'divider';
+
+        attSection = document.createElement('div');
+        attSection.className = 'profile-section';
+        attSection.id = 'attendance-extra-section';
+        attSection.innerHTML = '<h2 class="profile-section-title">کارکرد و حضور</h2><div class="info-list" id="attendance-extra-list"></div>';
+
+        const profileContent = document.getElementById('profile-content');
+        profileContent.appendChild(divider);
+        profileContent.appendChild(attSection);
+    }
+
+    const list = document.getElementById('attendance-extra-list');
+    list.innerHTML = '';
+
+    attendanceList.forEach(function(item) {
+        list.appendChild(createInfoRow(
+            'icon-user-check',
+            item.Attendance_Factor_Title || '-',
+            formatMinutes(item.SumValue),
+            false
+        ));
+    });
+}
+
 async function loadProfile() {
     const data = await apiCall(`/api/employees/${employeeId}`);
 
@@ -240,7 +316,7 @@ async function loadProfile() {
             initials:       getInitials(data.Full_Name),
             avatarColor:    getAvatarColor(data.Employee_Code),
             contact: {
-                mobile:         data.mobile           || '-',
+                mobile:         data.Mobile           || '-',
                 workEmail:      '-',
                 workPhone:      '-',
                 officeLocation: data.Work_Loc_Name    || '-'
@@ -281,6 +357,26 @@ async function loadProfile() {
         });
         document.title = 'ماکان+ · ' + data.Full_Name;
         hideSkeleton();
+        // Fire salary, decree and attendance in parallel
+        Promise.allSettled([
+            apiCall(`/api/employees/${employeeId}/salary`),
+            apiCall(`/api/employees/${employeeId}/decree`),
+            apiCall(`/api/employees/${employeeId}/attendance`)
+        ]).then(function(results) {
+            const salaryResult     = results[0];
+            const decreeResult     = results[1];
+            const attendanceResult = results[2];
+
+            if (salaryResult.status === 'fulfilled' && salaryResult.value) {
+                renderSalary(salaryResult.value);
+            }
+            if (decreeResult.status === 'fulfilled' && decreeResult.value) {
+                renderDecree(decreeResult.value.results || []);
+            }
+            if (attendanceResult.status === 'fulfilled' && attendanceResult.value) {
+                renderAttendance(attendanceResult.value.results || []);
+            }
+        });
     }
 }
 

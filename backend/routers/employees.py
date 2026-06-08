@@ -23,6 +23,83 @@ def search_employees(
         return {"results": results, "count": len(results)}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    
+
+@router.get("/{employee_code}/salary")
+def get_employee_salary(
+    employee_code: str,
+    current_user: dict = Depends(get_current_user)
+    ):
+    clean_code = employee_code.replace("'", "''")
+    try:
+        detail = run_dax(load_query("employee_detail.dax", employee_code=clean_code))
+        if not detail:
+            raise HTTPException(status_code=404, detail="Employee not found")
+        
+        employee_id = detail[0].get("Employee_ID")
+        if not employee_id:
+            raise HTTPException(status_code=404, detail="Employee ID not found")
+        
+        dax = load_query("employee_salary.dax", employee_id=int(employee_id))
+        results = run_dax(dax)
+        if not results:
+            raise HTTPException(status_code=404, detail="Salary data not found")
+        return results[0]
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/{employee_code}/decree")
+def get_employee_decree(
+    employee_code: str,
+    current_user: dict = Depends(get_current_user)
+    ):
+    clean_code = employee_code.replace("'", "''")
+    try:
+        detail = run_dax(load_query("employee_detail.dax", employee_code=clean_code))
+        if not detail:
+            raise HTTPException(status_code=404, detail="Employee not found")
+        
+        employee_id = detail[0].get("Employee_ID")
+        if not employee_id:
+            raise HTTPException(status_code=404, detail="Employee ID not found")
+        
+        dax = load_query("employee_decree.dax", employee_id=int(employee_id))
+        results = run_dax(dax)
+        return {"results": results, "count": len(results)}
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/{employee_code}/attendance")
+def get_employee_attendance(
+    employee_code: str,
+    current_user: dict = Depends(get_current_user)
+    ):
+    clean_code = employee_code.replace("'", "''")
+    try:
+        detail = run_dax(load_query("employee_detail.dax", employee_code=clean_code))
+        if not detail:
+            raise HTTPException(status_code=404, detail="Employee not found")
+        
+        employee_id = detail[0].get("Employee_ID")
+        if not employee_id:
+            raise HTTPException(status_code=404, detail="Employee ID not found")
+        
+        dax = load_query("employee_attendance.dax", employee_id=int(employee_id))
+        results = run_dax(dax)
+        return {"results": results, "count": len(results)}
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.get("/{employee_code}")

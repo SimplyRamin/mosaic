@@ -1,0 +1,78 @@
+DEFINE
+    VAR __DS0FilterTable = 
+        FILTER(
+            KEEPFILTERS(VALUES('Fact_Salary'[Employee_ID])),
+            'Fact_Salary'[Employee_ID] = {employee_id}
+        )
+
+    VAR __DS0FilterTable2 = 
+        TREATAS(
+            {
+                "تعهدات کارفرما",
+                "سایر",
+                "مزایا",
+                "کسورات"
+            },
+            'Dim_Compensation'[CompensationType]
+        )
+
+    VAR __DS0FilterTable3 = 
+        TREATAS(
+            { CALCULATE(MAX('Fact_Salary'[Date_ID]), Dim_Employee[Employee_ID_BK] = {employee_id}) },
+            'Fact_Salary'[Date_ID]
+        )
+    
+    VAR __DS0FilterTable4 =
+        TREATAS(
+            {
+                "بن کارگری",
+                "بیمه تامین اجتماعی سهم کارمند",
+                "حق مسکن",
+                "حقوق پایه",
+                "خالص پرداختی",
+                "دستمزد و مزایای مشمول بیمه تامین اجتماعی",
+                "مالیات",
+                "جمع مزایا"
+            },
+            'Dim_Compensation'[Compensation_Title]
+        )
+    
+    VAR __DS0Core =
+        SUMMARIZECOLUMNS(
+            'Fact_Salary'[Corporation_ID],
+            'Fact_Salary'[Employee_ID],
+            'Dim_Employee'[Employee_Code],
+            'Fact_Salary'[Date_ID],
+            'Dim_Employee'[Company_Name],
+            'Dim_Compensation'[Compensation_Title],
+            __DS0FilterTable,
+            __DS0FilterTable2,
+            __DS0FilterTable3,
+            __DS0FilterTable4,
+            "SumPayable_Value",
+                SUM('Fact_Salary'[Payable_Value])
+        )
+EVALUATE
+ROW(
+    "Corporation_ID",       MAXX(__DS0Core, [Corporation_ID]),
+    "Employee_ID",          MAXX(__DS0Core, [Employee_ID]),
+    "Employee_Code",        MAXX(__DS0Core, [Employee_Code]),
+    "Date_ID",              MAXX(__DS0Core, [Date_ID]),
+    "Company_Name",         MAXX(__DS0Core, [Company_Name]),
+    "Base_Salary",
+        MAXX(FILTER(__DS0Core, [Compensation_Title] = "حقوق پایه"), [SumPayable_Value]),
+    "Housing_Allowance",
+        MAXX(FILTER(__DS0Core, [Compensation_Title] = "حق مسکن"), [SumPayable_Value]),
+    "Worker_Bonus",
+        MAXX(FILTER(__DS0Core, [Compensation_Title] = "بن کارگری"), [SumPayable_Value]),
+    "Insurance_Employee",
+        MAXX(FILTER(__DS0Core, [Compensation_Title] = "بیمه تامین اجتماعی سهم کارمند"), [SumPayable_Value]),
+    "Tax_Deduction",
+        MAXX(FILTER(__DS0Core, [Compensation_Title] = "مالیات"), [SumPayable_Value]),
+    "Gross_Salary",
+        MAXX(FILTER(__DS0Core, [Compensation_Title] = "جمع مزایا"), [SumPayable_Value]),
+    "Insurable_Wages",
+        MAXX(FILTER(__DS0Core, [Compensation_Title] = "دستمزد و مزایای مشمول بیمه تامین اجتماعی"), [SumPayable_Value]),
+    "Net_Salary",
+        MAXX(FILTER(__DS0Core, [Compensation_Title] = "خالص پرداختی"), [SumPayable_Value])
+)
