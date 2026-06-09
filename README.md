@@ -7,144 +7,163 @@ sdk: docker
 pinned: false
 ---
 
-# ماکان+ (Makan+)
-**سامانه منابع انسانی · گروه صنعتی طبیعت ماکان**
+# Mosaic — HR People Directory
 
-HR People Directory for Tabiat Makan Industrial Group — a mobile-first PWA for searching, identifying and viewing employee information across all subsidiaries and holdings.
+A mobile-first Persian RTL Progressive Web App (PWA) for searching and viewing employee profiles across a large industrial holding group.
+
+Built as a production system for a conglomerate with 8 holding companies, 35 subsidiaries, and ~100,000 employees.
+
+**Live Demo:** [mosaic-a5t.pages.dev](https://mosaic-a5t.pages.dev)  
+**Demo credentials:** Employee code `1` · Password `demo1234`
+
+---
+
+## Screenshots
+
+> Persian RTL mobile-first interface with JWT auth, real-time search, and detailed employee profiles including compensation and decree history.
+
 
 ---
 
 ## Features
 
-- Persian (RTL) mobile-first interface
-- Full-text employee search
-- Voice search (Persian — requires internet)
-- Camera-based face identification (Phase 2)
-- Role-based access control (RBAC)
+- Persian (RTL) mobile-first PWA — installable on iPhone/Android home screen
+- Full-text employee search across 100k+ records
+- Voice search — Persian speech recognition via Whisper (CPU-only, runs locally)
+- Employee profiles with compensation, decree history, and attendance data
+- JWT authentication with refresh tokens, account lockout, and session management
+- Home dashboard — active headcount, gender ratio, avg age, avg tenure, top departments
 - Offline support via service worker
-- PWA — installable on iPhone home screen
+- Update detection and notification system
 
 ---
 
 ## Project Structure
-```makan-plus/
-├── frontend/               ← PWA (HTML, CSS, JS)
+```
+mosaic/
+├── frontend/               ← PWA (HTML, CSS, Vanilla JS)
 │   ├── index.html          ← Login screen
 │   ├── manifest.json       ← PWA manifest
 │   ├── sw.js               ← Service worker
-│   ├── version.json        ← Version for update detection
-│   ├── serve.py            ← Local HTTPS dev server
-│   ├── screens/            ← App screens
-│   │   ├── home.html
-│   │   ├── search.html
-│   │   ├── profile.html
-│   │   ├── camera.html
-│   │   └── forgot-password.html
+│   ├── version.json        ← Version-based update detection
+│   ├── screens/            ← App screens (home, search, profile, camera)
 │   ├── css/                ← Stylesheets
-│   ├── js/                 ← JavaScript
-│   └── assets/             ← Fonts, icons, images
+│   ├── js/                 ← JavaScript modules
+│   └── assets/             ← Vazirmatn font, SVG sprites, icons
 ├── backend/                ← FastAPI (Python, UV)
-└── docs/                   ← Database specs, design files
+│   ├── main.py             ← App entry point, lifespan events
+│   ├── routers/            ← employees, auth, stats, speech
+│   ├── core/               ← database, auth, config, whisper, name cache
+│   └── queries/            ← DAX query files (original hr-cube queries)
+├── scripts/
+│   └── anonymize.py        ← Data anonymization + Postgres loading pipeline
+├── docs/                   ← Database specs, data catalogue
+└── Dockerfile              ← HF Spaces deployment
 ```
 ---
+
+## Architecture
+Cloudflare Pages          Hugging Face Spaces        Neon (PostgreSQL)
+(Static PWA)      ──────► (FastAPI Docker)    ──────► (Frankfurt, EU)
+mosaic-a5t.pages.dev      ramool-mosaic.hf.space      ~100k employees
+~913k salary rows
+~111k decree rows
+
+--- 
 
 ## Tech Stack
 
 | Layer | Technology |
 |---|---|
-| Frontend | HTML, CSS, Vanilla JS (PWA) |
+| Frontend | Vanilla HTML, CSS, JavaScript — PWA, no frameworks |
 | Backend | Python, FastAPI, UV |
-| Database (app) | Microsoft SQL Server — MakanApp |
-| Database (data) | Microsoft SQL Server — MakanDWH |
-| Data source | Microsoft Analysis Services (DAX) |
-| Font | Vazirmatn |
+| Database | PostgreSQL (Neon serverless) |
+| Voice Search | faster-whisper (medium model, CPU-only) + rapidfuzz fuzzy matching |
+| Auth | JWT (HS256), bcrypt, refresh token rotation |
+| Frontend Hosting | Cloudflare Pages |
+| Backend Hosting | Hugging Face Spaces (Docker) |
+
 
 ---
 
 ## Local Development
 
-### Frontend (HTTP — PC browser only)
+### Prerequisites
+- Python 3.11+
+- UV package manager
+- mkcert (for HTTPS — required for PWA and microphone access)
+
+### Setup
 
 ```bash
-cd frontend
-python -m http.server 8000
-```
+# Clone the repo
+git clone https://github.com/SimplyRamin/mosaic.git
+cd mosaic
 
-Open `http://localhost:8000`
-
-### Frontend (HTTPS — required for iPhone camera and PWA testing)
-
-Requires mkcert certificate files in `frontend/` — see `docs/` for setup guide.
-
-```bash
-cd frontend
-python serve.py
-```
-
-Open `https://localhost:8443` on PC or `https://YOUR_LOCAL_IP:8443` on iPhone.
-
-### Backend
-
-```bash
+# Set up backend environment
 cd backend
-uv run uvicorn main:app --reload
+cp .env.example .env
+# Edit .env with your DATABASE_URL and SECRET_KEY
+uv sync
+
+# Run both frontend and backend
+cd ..
+python start.py
 ```
 
----
+Open `https://localhost:8443`
 
-## Deployment
+### Environment Variables
 
-When deploying new code, increment `version.json` to trigger update notification on installed PWAs:
-
-```json
-{ "version": "1.0.1" }
-```
-
----
-
-## Database
-
-Two SQL Server databases:
-
-- **MakanDWH** — read-only data warehouse, populated via ETL from Analysis Services. Owned by data team.
-- **MakanApp** — operational tables for auth, RBAC, sessions and audit log. Owned by backend team.
-
-See `docs/database/` for full schema specifications.
-
----
-
-## Access Levels
-
-| Role | Description |
+| Variable | Description |
 |---|---|
-| `employee` | Basic access — general info only |
-| `manager` | Team data — salary, attendance, contact |
-| `hr_specialist` | Department data — full HR details |
-| `hr_admin` | All employees — full access + user management |
-| `executive` | All employees — aggregates only for salary |
-
-> Current PoC scope: all users are `hr_admin` or `manager` level — full access to all employees.
+| `DATABASE_URL` | Neon (or any Postgres) connection string |
+| `SECRET_KEY` | JWT signing secret |
+| `ENABLE_WHISPER` | Set to `true` to enable voice search (requires ~2GB RAM) |
 
 ---
 
-## Known Limitations
+## Data Pipeline
 
-- Voice search requires internet (Apple speech servers) — blocked in Iran without VPN
-- Camera search requires HTTPS
-- Face recognition (camera search) is PoC only — requires employee photo database for full deployment
-- Org chart disabled — direct manager hierarchy not yet available in source data
+The `scripts/anonymize.py` script handles the full data pipeline:
 
----
+1. Reads 5 CSV exports from the original HR data warehouse
+2. Anonymizes personal data — names replaced with fake Persian names via Faker, national IDs and mobile numbers replaced with fake values, employee IDs remapped sequentially
+3. Loads anonymized data into PostgreSQL via psycopg2 with chunked inserts
 
-## Backlog
-
-- [ ] Dark mode
-- [ ] OTP / two-factor login
-- [ ] RBAC enforcement (waiting for clean org hierarchy data)
-- [ ] Org chart screen
-- [ ] Face recognition at scale (requires employee photos)
-- [ ] Export to Excel
+```bash
+cd scripts
+pip install pandas faker psycopg2-binary
+python anonymize.py           # full run
+python anonymize.py --load-only  # skip anonymization, just load to DB
+```
 
 ---
 
-*Tabiat Makan Industrial Group · Planning & Systems Development Department*
+## Voice Search
+
+Voice search uses [faster-whisper](https://github.com/guillaumekln/faster-whisper) (medium model, CPU-only) for Persian speech recognition, combined with rapidfuzz fuzzy matching against an in-memory cache of all employee names loaded at startup.
+
+Disabled on the hosted demo due to memory constraints. Set `ENABLE_WHISPER=true` locally to enable.
+
+---
+
+## Notable Technical Decisions
+
+- **Vanilla JS, no frameworks** — intentional choice to understand every line of the codebase
+- **Persian RTL** — full right-to-left layout with Vazirmatn font, safe area support for iPhone notch
+- **CPU-only Whisper** — no GPU available on the production server; faster-whisper with int8 quantization made it feasible
+- **DAX queries** — original version connected to Microsoft Analysis Services via pywin32/ADO; portfolio version uses PostgreSQL
+- **Connection pooling** — psycopg2 SimpleConnectionPool to avoid per-request connection overhead
+
+---
+
+## Background
+
+This project was built as a production HR directory for a large Iranian industrial conglomerate. The project was cancelled mid-development. This portfolio version uses anonymized data and a public PostgreSQL database.
+
+The original system connected to Microsoft Analysis Services (`hr-cube`) via DAX queries for all HR data, with a separate SQL Server database for authentication. The DAX query files are preserved in `backend/queries/` for reference.
+
+---
+
+*Built by Ramin Ferdos · [simplyramin.github.io](https://simplyramin.github.io)*
