@@ -5,7 +5,7 @@
 # =================================================================================================
 
 from rapidfuzz import process, fuzz
-from core.database import run_dax
+from core.database import run_pg
 import threading
 
 _cache = []
@@ -16,22 +16,12 @@ def load_names():
     global _cache
     print("Loading employee name cache...")
     try:
-        dax = """
-        EVALUATE
-        SUMMARIZE(
-            'Dim_Employee',
-            'Dim_Employee'[Full_Name]
-        )
-        """
-        results = run_dax(dax)
-        print(f"DAX returned {len(results)} rows")
-
+        results = run_pg("SELECT full_name FROM employees WHERE full_name IS NOT NULL")
         with _lock:
-            _cache = [r['Full_Name'] for r in results if r.get('Full_Name')]
+            _cache = [r['full_name'] for r in results]
         print(f"Name cache loaded: {len(_cache)} names")
     except Exception as e:
         print(f"Name cache error: {type(e).__name__}: {e}")
-
 
 def find_closest_name(transcript: str, limit: int = 3) -> list[dict]:
     with _lock:
