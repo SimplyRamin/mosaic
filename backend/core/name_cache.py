@@ -16,12 +16,21 @@ def load_names():
     global _cache
     print("Loading employee name cache...")
     try:
-        results = run_pg("SELECT full_name FROM employees WHERE full_name IS NOT NULL")
+        import psycopg2
+        from psycopg2.extras import RealDictCursor
+        from core.config import settings
+        conn = psycopg2.connect(settings.database_url)
+        cursor = conn.cursor(cursor_factory=RealDictCursor)
+        cursor.execute("SELECT full_name FROM employees WHERE full_name IS NOT NULL")
+        rows = cursor.fetchall()
+        cursor.close()
+        conn.close()
         with _lock:
-            _cache = [r['full_name'] for r in results]
+            _cache = [r['full_name'] for r in rows]
         print(f"Name cache loaded: {len(_cache)} names")
     except Exception as e:
         print(f"Name cache error: {type(e).__name__}: {e}")
+
 
 def find_closest_name(transcript: str, limit: int = 3) -> list[dict]:
     with _lock:

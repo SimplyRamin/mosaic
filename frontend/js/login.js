@@ -100,7 +100,7 @@ mockDemoBtn.addEventListener('click', function() {
 // Real data demo
 realDemoBtn.addEventListener('click', function() {
     setAppMode(DEMO_MODES.REAL);
-    employeeIdInput.value = '000001';
+    employeeIdInput.value = '1';
     passwordInput.value   = 'demo1234';
     setTimeout(function() {
         loginBtn.click();
