@@ -208,3 +208,7 @@ frontend/localhost+2-key.pem
 *.csv
 *.sqlite
 *.db
+
+# Binary assets
+docs/design/*.png
+docs/design/*.jpg
