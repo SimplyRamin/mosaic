@@ -5,7 +5,6 @@
 # =================================================================================================
 
 from rapidfuzz import process, fuzz
-from core.database import run_pg
 import threading
 
 _cache = []
