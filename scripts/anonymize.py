@@ -284,7 +284,7 @@ def load_to_postgres(conn, anon_employees, anon_salary, anon_commission, compani
         """, chunk, page_size=5000)
         conn.commit()
         print(f'  {min(i + chunk_size, total):,} / {total:,} rows loaded.')
-    print(f'  Done.')
+    print('  Done.')
 
     # Commission
     print('Loading commission...')
@@ -301,7 +301,7 @@ def load_to_postgres(conn, anon_employees, anon_salary, anon_commission, compani
         """, chunk, page_size=5000)
         conn.commit()
         print(f'  {min(i + chunk_size, total):,} / {total:,} rows loaded.')
-    print(f'  Done.')
+    print('  Done.')
 
     cursor.close()
     print('All data loaded.')
