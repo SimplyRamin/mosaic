@@ -130,14 +130,52 @@ def anonymize_commission(commission, id_mapping):
     return df
 
 
-def save_anonymized(anon_employees, anon_salary, anon_commission, companies, departments):
+def anonymize_companies(companies, employees):
+    print('Anonymizing company and holding names...')
+
+    # Generate fake holding names for each unique real holding
+    unique_holdings = companies['Holding_Name'].dropna().unique()
+    holding_map = {}
+    for h in unique_holdings:
+        if str(h) in ('NaN', 'بدون گروه', 'nan'):
+            holding_map[h] = str(h)
+        else:
+            holding_map[h] = f'گروه صنعتی {fake.company()}'
+    
+    # Generate fake company names for each unique corporation_id
+    unique_corps = companies['Corporation_ID'].unique()
+    company_map = {}
+    for cid in unique_corps:
+        company_map[cid] = f'شرکت {fake.company()}'
+
+    # Apply to companies table
+    df_companies = companies.copy()
+    df_companies['Holding_Name'] = df_companies['Holding_Name'].map(
+        lambda x: holding_map.get(x, x)
+    )
+    df_companies['Company_Name'] = df_companies['Corporation_ID'].map(company_map)
+
+    # Apply same mapping to employees table
+    df_employees = employees.copy()
+    df_employees['Holding_Name'] = df_employees['Holding_Name'].map(
+        lambda x: holding_map.get(x, x)
+    )
+    df_employees['Company_Name'] = df_employees['Corporation_ID'].map(company_map)
+
+    print(f'    Done. {len(unique_holdings)} holdings, {len(unique_corps)} companies anonymized.')
+    return df_companies, df_employees
+
+
+def save_anonymized(anon_employees, anon_salary, anon_commission, anon_companies, departments):
     print('Saving anonymized files...')
-    anon_employees.to_csv(OUT_EMPLOYEES,   index=False, encoding='utf-8-sig')
-    anon_salary.to_csv(OUT_SALARY,         index=False, encoding='utf-8-sig')
-    anon_commission.to_csv(OUT_COMMISSION, index=False, encoding='utf-8-sig')
-    print(f'    Saved: {OUT_EMPLOYEES.name}')
-    print(f'    Saved: {OUT_SALARY.name}')
-    print(f'    Saved: {OUT_COMMISSION.name}')
+    anon_employees.to_csv(OUT_EMPLOYEES,                    index=False, encoding='utf-8-sig')
+    anon_salary.to_csv(OUT_SALARY,                          index=False, encoding='utf-8-sig')
+    anon_commission.to_csv(OUT_COMMISSION,                  index=False, encoding='utf-8-sig')
+    anon_companies.to_csv(DATA_DIR / 'anon_companies.csv',  index=False, encoding='utf-8-sig')
+    print(f'  Saved: {OUT_EMPLOYEES.name}')
+    print(f'  Saved: {OUT_SALARY.name}')
+    print(f'  Saved: {OUT_COMMISSION.name}')
+    print('  Saved: anon_companies.csv')
     print('Done.')
 
 
@@ -312,22 +350,24 @@ if __name__ == '__main__':
     import sys
 
     if '--load-only' in sys.argv:
-        # Skip anonymization - read already saved files
         print('Loading anonymized files...')
-        anon_employees  = pd.read_csv(OUT_EMPLOYEES,  encoding='utf-8-sig', low_memory=False)
-        anon_salary     = pd.read_csv(OUT_SALARY,     encoding='utf-8-sig')
-        anon_commission = pd.read_csv(OUT_COMMISSION, encoding='utf-8-sig')
-        companies       = pd.read_csv(COMPANIES_FILE,    encoding='utf-8-sig', sep=None, engine='python')
-        departments     = pd.read_csv(DEPARTMENTS_FILE,  encoding='utf-8-sig', sep=None, engine='python')
+        anon_employees  = pd.read_csv(OUT_EMPLOYEES,                    encoding='utf-8-sig', low_memory=False)
+        anon_salary     = pd.read_csv(OUT_SALARY,                       encoding='utf-8-sig')
+        anon_commission = pd.read_csv(OUT_COMMISSION,                   encoding='utf-8-sig')
+        anon_companies  = pd.read_csv(DATA_DIR / 'anon_companies.csv',  encoding='utf-8-sig')
+        departments     = pd.read_csv(DEPARTMENTS_FILE,                 encoding='utf-8-sig', sep=None, engine='python')
         print(f'  Employees:   {len(anon_employees):,}')
         print(f'  Salary:      {len(anon_salary):,}')
         print(f'  Commission:  {len(anon_commission):,}')
+        print(f'  Companies:   {len(anon_companies):,}')
     else:
         employees, companies, departments, salary, commission = load_data()
-        anon_employees, id_mapping = anonymize_employees(employees)
-        anon_salary                = anonymize_salary(salary, id_mapping)
-        anon_commission            = anonymize_commission(commission, id_mapping)
-        save_anonymized(anon_employees, anon_salary, anon_commission, companies, departments)
+        anon_employees, id_mapping          = anonymize_employees(employees)
+        anon_salary                         = anonymize_salary(salary, id_mapping)
+        anon_commission                     = anonymize_commission(commission, id_mapping)
+        anon_companies, anon_employees      = anonymize_companies(companies, anon_employees)
+
+        save_anonymized(anon_employees, anon_salary, anon_commission, anon_companies, departments)
 
     print('\nConnecting to Postgres...')
     conn = psycopg2.connect(DB_URL)

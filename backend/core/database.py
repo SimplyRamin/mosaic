@@ -4,32 +4,15 @@
 #                            Ferdos.ramin@gmail.com | simplyramin.github.io
 # =================================================================================================
 
-from psycopg2 import pool
+import psycopg2
 from psycopg2.extras import RealDictCursor
 from core.config import settings
 
 
-# --------------------------- Postgres (Portfolio) --------------------------- #
-
-_pg_pool = None
-
-def get_pg_pool():
-    global _pg_pool
-    if _pg_pool is None:
-        _pg_pool = pool.SimpleConnectionPool(
-            minconn=1,
-            maxconn=10,
-            dsn=settings.database_url
-        )
-    return _pg_pool
-
+# --------------------------- Postgres (Portfolio) -------------------------- #
 
 def get_pg_connection():
-    return get_pg_pool().getconn()
-
-
-def release_pg_connection(conn):
-    get_pg_pool().putconn(conn)
+    return psycopg2.connect(settings.database_url)
 
 
 def run_pg(query: str, params: tuple = ()) -> list[dict]:
@@ -38,11 +21,9 @@ def run_pg(query: str, params: tuple = ()) -> list[dict]:
         cursor = conn.cursor(cursor_factory=RealDictCursor)
         cursor.execute(query, params)
         rows = cursor.fetchall()
-        result = [dict(row) for row in rows]
-        cursor.close()
-        return result
+        return [dict(row) for row in rows]
     finally:
-        release_pg_connection(conn)
+        conn.close()
 
 
 def execute_pg(query: str, params: tuple = ()) -> int:
@@ -51,8 +32,6 @@ def execute_pg(query: str, params: tuple = ()) -> int:
         cursor = conn.cursor()
         cursor.execute(query, params)
         conn.commit()
-        affected = cursor.rowcount
-        cursor.close()
-        return affected
+        return cursor.rowcount
     finally:
-        release_pg_connection(conn)
+        conn.close()
