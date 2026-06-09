@@ -65,12 +65,10 @@ loginBtn.addEventListener('click', function() {
         loginBtn.textContent = 'ورود به سامانه';
 
         if (result.status === 200) {
-            // Store tokens
             localStorage.setItem('access_token', result.data.access_token);
             localStorage.setItem('refresh_token', result.data.refresh_token);
             localStorage.setItem('user', JSON.stringify(result.data.user));
-
-            // Navigate to home
+            localStorage.setItem('app_mode', 'real'); // always real on actual login
             window.location.href = 'screens/home.html';
         } else {
             errorMessage.textContent = result.data.detail || 'خطا در ورود به سامانه';
@@ -102,7 +100,7 @@ mockDemoBtn.addEventListener('click', function() {
 // Real data demo
 realDemoBtn.addEventListener('click', function() {
     setAppMode(DEMO_MODES.REAL);
-    employeeIdInput.value = '210197';
+    employeeIdInput.value = '000001';
     passwordInput.value   = 'demo1234';
     setTimeout(function() {
         loginBtn.click();
