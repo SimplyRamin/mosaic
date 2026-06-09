@@ -1,3 +1,12 @@
+---
+title: Mosaic
+emoji: 🏢
+colorFrom: blue
+colorTo: indigo
+sdk: docker
+pinned: false
+---
+
 # ماکان+ (Makan+)
 **سامانه منابع انسانی · گروه صنعتی طبیعت ماکان**
 
