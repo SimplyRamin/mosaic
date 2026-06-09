@@ -1,7 +1,7 @@
 const DEMO_MODE = true;
 const API_BASE  = window.location.hostname === 'localhost'
     ? 'https://localhost:8001'
-    : `https://${window.location.hostname}:8001`
+    : 'https://ramool-mosaic.hf.space';
 
 //Mode: 'mock' = mock data, 'real' = real backend
 const DEMO_MODES = {
