@@ -1,7 +1,9 @@
 # =================================================================================================
 #                                           Written by Ramin F.
-#                                   for Tabiat Makan Industrial Group
+#                                      AI Engineer & Data Scientist
+#                            Ferdos.ramin@gmail.com | simplyramin.github.io
 # =================================================================================================
+
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -18,6 +20,16 @@ async def lifespan(app: FastAPI):
     # Load name cache in background thread on startup
     thread = threading.Thread(target=load_names, daemon=True)
     thread.start()
+    
+    # Test Postgres connection
+    try:
+        from core.database import get_pg_connection
+        conn = get_pg_connection()
+        conn.close()
+        print("Postgres connection: OK")
+    except Exception as e:
+        print(f"Postgres connection: FAILED - {e}")
+    
     yield
 
 

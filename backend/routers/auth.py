@@ -6,18 +6,15 @@
 
 from fastapi import APIRouter, HTTPException, Request, status, Depends
 from pydantic import BaseModel
-from core.database import run_sql, execute_sql
+from core.database import run_pg, execute_pg
 from core.security import (
     verify_password, create_access_token,
     create_refresh_token, hash_refresh_token, decode_token
 )
 from core.auth import get_current_user
-from core.config import settings
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
-
-SCHEMA = settings.sql_schema
 
 
 class LoginRequest(BaseModel):
@@ -31,11 +28,11 @@ class RefreshRequest(BaseModel):
 
 @router.post("/login")
 def login(body: LoginRequest, request: Request):
-    users = run_sql(
-        f"""SELECT User_id, Employee_id, Employee_Code, Username, 
-        Password_hash, Is_active, Last_login, Failed_attempts, 
-        Locked_until, Created_by, Created_at, Updated_at 
-        FROM {SCHEMA}.Users WHERE Employee_Code = ? AND Is_active = 1""",
+    users = run_pg(
+        """SELECT user_id, employee_id, employee_code, username,
+        password_hash, is_active, last_login, failed_attempts,
+        locked_until, created_at
+        FROM users WHERE employee_code = %s AND is_active = TRUE""",
         (body.employee_code,)
     )
 
@@ -49,27 +46,26 @@ def login(body: LoginRequest, request: Request):
 
 
     # Check if locked
-    if user['Locked_until'] and user['Locked_until'] > datetime.now(timezone.utc):
+    if user['locked_until'] and user['locked_until'] > datetime.now(timezone.utc):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="حساب کاربری موقتا غیرفعال شده است"
         )
     
     # Verify password
-    if not verify_password(body.password, user['Password_hash']):
+    if not verify_password(body.password, user['password_hash']):
         # Increment failed attempts
-        attempts = (user['Failed_attempts'] or 0) + 1
+        attempts = (user['failed_attempts'] or 0) + 1
         if attempts >= 5:
-            execute_sql(
-                f"UPDATE {SCHEMA}.Users SET Failed_attempts = ?, "
-                f"Locked_until = DATEADD(MINUTE, 30, GETDATE()) "
-                f"WHERE User_id = ?",
-                (attempts, user['User_id'])
+            locked_until = datetime.now(timezone.utc) + timedelta(minutes=30)
+            execute_pg(
+                "UPDATE users SET failed_attempts = %s, locked_until = %s WHERE user_id = %s",
+                (attempts, locked_until, user['user_id'])
             )
         else:
-            execute_sql(
-                f"UPDATE {SCHEMA}.Users SET Failed_attempts = ? WHERE User_id = ?",
-                (attempts, user['User_id'])
+            execute_pg(
+                "UPDATE users SET failed_attempts = %s WHERE user_id = %s",
+                (attempts, user['user_id'])
             )
         
         raise HTTPException(
@@ -78,18 +74,17 @@ def login(body: LoginRequest, request: Request):
         )
     
     # Reset failed attempts
-    execute_sql(
-        f"UPDATE {SCHEMA}.Users SET Failed_attempts = 0, "
-        f"Locked_until = NULL, Last_login = GETDATE() WHERE User_id = ?",
-        (user['User_id'])
+    execute_pg(
+        "UPDATE users SET failed_attempts = 0, locked_until = NULL, last_login = NOW() WHERE user_id = %s",
+        (user['user_id'],)
     )
 
     # Create tokens
     token_data = {
-        "user_id":       user['User_id'],
-        "employee_id":   user['Employee_id'],
-        "employee_code": user['Employee_Code'],
-        "username":      user['Username']
+        "user_id":       user['user_id'],
+        "employee_id":   user['employee_id'],
+        "employee_code": user['employee_code'],
+        "username":      user['username']
     }
 
     access_token  = create_access_token(token_data)
@@ -101,41 +96,29 @@ def login(body: LoginRequest, request: Request):
     ip_address  = request.client.host if request.client else "unknown"
 
     # Revoke existing sessions from same device before creating new one
-    execute_sql(
-        f"UPDATE {SCHEMA}.Sessions SET Revoked_at = GETDATE() "
-        f" WHERE User_id = ? AND Device_name = ? AND Revoked_at IS NULL",
-        (user['User_id'], device_name)
+    execute_pg(
+        "UPDATE sessions SET revoked_at = NOW() WHERE user_id = %s AND device_name = %s AND revoked_at IS NULL",
+        (user['user_id'], device_name)
     )
 
     # Cleanup expired and revoked sessions for this user
-    execute_sql(
-        f"DELETE FROM {SCHEMA}.Sessions "
-        f"WHERE User_id = ? AND "
-        f"(Expires_at < GETDATE() OR Revoked_at IS NOT NULL)",
-        (user['User_id'],)
+    execute_pg(
+        "DELETE FROM sessions WHERE user_id = %s AND (expires_at < NOW() OR revoked_at IS NOT NULL)",
+        (user['user_id'],)
     )
 
-    execute_sql(
-        f"INSERT INTO {SCHEMA}.Sessions "
-        f"(User_id, Refresh_token, Device_name, Device_os, Ip_address, "
-        f"Created_at, Last_used_at, Expires_at) "
-        f"VALUES (?, ?, ?, ?, ?, GETDATE(), GETDATE(), "
-        f"DATEADD(DAY, 30, GETDATE()))",
-        (
-            user['User_id'],
-            hash_refresh_token(refresh_token),
-            device_name,
-            device_os,
-            ip_address
-        )
+    expires_at = datetime.now(timezone.utc) + timedelta(days=30)
+    execute_pg(
+        """INSERT INTO sessions
+        (user_id, refresh_token, device_name, device_os, ip_address, expires_at)
+        VALUES (%s, %s, %s, %s, %s, %s)""",
+        (user['user_id'], hash_refresh_token(refresh_token), device_name, device_os, ip_address, expires_at)
     )
 
     # Log the action
-    execute_sql(
-        f"INSERT INTO {SCHEMA}.Audit_log "
-        f"(User_id, Action, Result, Ip_address, Created_at) "
-        f"VALUES (?, 'login', 'allowed', ?, GETDATE())",
-        (user['User_id'], ip_address)
+    execute_pg(
+        "INSERT INTO audit_log (user_id, action, result, ip_address) VALUES (%s, 'login', 'allowed', %s)",
+        (user['user_id'], ip_address)
     )
 
     return {
@@ -143,9 +126,9 @@ def login(body: LoginRequest, request: Request):
         "refresh_token": refresh_token,
         "token_type":    "bearer",
         "user": {
-            "user_id":       user['User_id'],
-            "employee_code": user['Employee_Code'],
-            "username":      user['Username']
+            "user_id":       user['user_id'],
+            "employee_code": user['employee_code'],
+            "username":      user['username']
         }
     }
 
@@ -167,10 +150,8 @@ def refresh(body: RefreshRequest):
     
     # Check sessions exists and not revoked
     hashed = hash_refresh_token(body.refresh_token)
-    sessions = run_sql(
-        f"SELECT * FROM {SCHEMA}.Sessions "
-        f"WHERE Refresh_token = ? AND Revoked_at IS NULL "
-        f"AND Expires_at > GETDATE()",
+    sessions = run_pg(
+        "SELECT * FROM sessions WHERE refresh_token = %s AND revoked_at IS NULL AND expires_at > NOW()",
         (hashed,)
     )
 
@@ -181,9 +162,8 @@ def refresh(body: RefreshRequest):
         )
     
     # Update last used
-    execute_sql(
-        f"UPDATE {SCHEMA}.Sessions SET Last_used_at = GETDATE() "
-        f"WHERE Refresh_token = ?",
+    execute_pg(
+        "UPDATE sessions SET last_used_at = NOW() WHERE refresh_token = %s",
         (hashed,)
     )
 
@@ -207,9 +187,8 @@ def logout(
     current_user: dict = Depends(get_current_user)
 ):
     hashed  = hash_refresh_token(body.refresh_token)
-    execute_sql(
-        f"UPDATE {SCHEMA}.Sessions SET Revoked_at = GETDATE() "
-        f"WHERE Refresh_token = ? AND User_id = ?",
+    execute_pg(
+        "UPDATE sessions SET revoked_at = NOW() WHERE refresh_token = %s AND user_id = %s",
         (hashed, current_user["user_id"])
     )
     return {"message": "logged out"}

@@ -19,6 +19,7 @@ class Settings(BaseSettings):
     sql_username: str
     sql_password: str
     sql_schema: str = "MakanPlus"
+    database_url: str = ""
 
     # APP
     app_env: str = "development"
