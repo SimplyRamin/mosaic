@@ -195,3 +195,16 @@ Thumbs.db
 *.pem
 *.key
 frontend/serve.py
+
+# Whisper model cache
+backend/models/
+backend/.cache/
+
+# SSL certificates (dev)
+frontend/localhost+2.pem
+frontend/localhost+2-key.pem
+
+# Data files
+*.csv
+*.sqlite
+*.db
