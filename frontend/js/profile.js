@@ -11,7 +11,7 @@ const mockEmployees = {
         name: 'علی صادقی',
         position: 'مهندس ارشد بک‌اند',
         department: 'مهندسی',
-        company: 'شرکت فناوری ماکان',
+        company: 'شرکت فناوری موزاییک',
         holding: 'هلدینگ فناوری',
         initials: 'ع‌ص',
         avatarColor: '#1e3a8a',
@@ -53,7 +53,7 @@ const mockEmployees = {
         name: 'مریم رحیمی',
         position: 'تحلیلگر داده',
         department: 'هوش تجاری',
-        company: 'شرکت فناوری ماکان',
+        company: 'شرکت فناوری موزاییک',
         holding: 'هلدینگ فناوری',
         initials: 'م‌ر',
         avatarColor: '#16a34a',
@@ -298,7 +298,7 @@ async function loadProfile() {
                     initials:    employee.initials,
                     avatarColor: employee.avatarColor
                 });
-                document.title = document.title = 'ماکان+ · ' + employee.name;
+                document.title = document.title = 'Mosaic · ' + employee.name;
             } else {
                 renderNotFound();
             }
@@ -355,7 +355,7 @@ async function loadProfile() {
             initials:    getInitials(data.Full_Name),
             avatarColor: getAvatarColor(data.Employee_Code)
         });
-        document.title = 'ماکان+ · ' + data.Full_Name;
+        document.title = 'Mosaic · ' + data.Full_Name;
         hideSkeleton();
         // Fire salary, decree and attendance in parallel
         Promise.allSettled([

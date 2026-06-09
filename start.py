@@ -1,6 +1,7 @@
 # =================================================================================================
 #                                           Written by Ramin F.
-#                                   for Tabiat Makan Industrial Group
+#                                      AI Engineer & Data Scientist
+#                            Ferdos.ramin@gmail.com | simplyramin.github.io
 # =================================================================================================
 
 import subprocess
@@ -80,7 +81,7 @@ def start_backend():
 if __name__ == "__main__":
     check_certs()
 
-    print("\n Makan+ Development server")
+    print("\n Mosaic Development server")
     print("-" * 40)
 
     start_frontend()

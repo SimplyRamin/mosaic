@@ -1,6 +1,6 @@
 // Version: 2025-06-08-012
-const CACHE_VERSION = 'makanplus-v2';
-const CACHE_NAME = `makanplus-${CACHE_VERSION}`;
+const CACHE_VERSION = 'mosaic-v1';
+const CACHE_NAME = `mosaic-${CACHE_VERSION}`;
 
 // Files to cache for offline use
 const ASSETS = [

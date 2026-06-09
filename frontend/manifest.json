@@ -1,7 +1,7 @@
 {
-    "name": "Makan+",
-    "short_name": "Makan+",
-    "description": "سامانه منابع انسانی گروه صنعتی طبیعت ماکان",
+    "name": "Mosaic",
+    "short_name": "Mosaic",
+    "description": "HR People Directory — Persian RTL PWA",
     "start_url": "/",
     "display": "standalone",
     "orientation": "portrait",
