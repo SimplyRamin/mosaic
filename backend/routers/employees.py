@@ -1,6 +1,7 @@
 # =================================================================================================
 #                                           Written by Ramin F.
-#                                   for Tabiat Makan Industrial Group
+#                                      AI Engineer & Data Scientist
+#                            Ferdos.ramin@gmail.com | simplyramin.github.io
 # =================================================================================================
 
 from fastapi import APIRouter, Query, HTTPException, Depends

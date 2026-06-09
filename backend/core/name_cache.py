@@ -1,7 +1,9 @@
 # =================================================================================================
 #                                           Written by Ramin F.
-#                                   for Tabiat Makan Industrial Group
+#                                      AI Engineer & Data Scientist
+#                            Ferdos.ramin@gmail.com | simplyramin.github.io
 # =================================================================================================
+
 from rapidfuzz import process, fuzz
 from core.database import run_dax
 import threading

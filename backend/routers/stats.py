@@ -1,7 +1,9 @@
 # =================================================================================================
 #                                           Written by Ramin F.
-#                                   for Tabiat Makan Industrial Group
+#                                      AI Engineer & Data Scientist
+#                            Ferdos.ramin@gmail.com | simplyramin.github.io
 # =================================================================================================
+
 from fastapi import APIRouter, HTTPException, Depends
 from core.database import run_dax, load_query
 from core.auth import get_current_user
