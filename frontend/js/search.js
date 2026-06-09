@@ -268,6 +268,11 @@ async function sendAudioToWhisper(audioBlob) {
             body: formData
         });
 
+        if (response.status === 503) {
+            showToast('جستجوی صوتی در نسخه آنلاین در دسترس نیست', 'info');
+            return;
+        }
+
         if (!response.ok) throw new Error('transcription failed');
 
         const data = await response.json()

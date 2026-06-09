@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     # APP
     app_env:    str = "development"
     secret_key: str
+    enable_whisper: bool = False
 
     model_config = {
         "env_file": Path(__file__).parent.parent / ".env"

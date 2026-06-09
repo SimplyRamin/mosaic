@@ -21,7 +21,10 @@ async def transcribe(
     ):
     model = get_model()
     if model is None:
-        raise HTTPException(status_code=503, detail="Speech model not ready yet")
+        raise HTTPException(
+            status_code=503,
+            detail="voice_search_unavailable"
+        )
 
     # Validate file type
     if audio.content_type not in [
